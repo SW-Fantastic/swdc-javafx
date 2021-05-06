@@ -18,6 +18,18 @@ public abstract class AbstractView {
         return view;
     }
 
+    public void show(){
+        if (this.stage != null) {
+            this.stage.show();
+        }
+    }
+
+    public void hide(){
+        if (this.stage != null && this.stage.isShowing()) {
+            this.stage.close();
+        }
+    }
+
     void setStage(Stage stage) {
         if (view == null) {
             view = this.render();

@@ -107,6 +107,9 @@ public class Theme {
 
             String[] additionalStyleSheets = desc.getProperty(String[].class,"css");
             for (String styleName: additionalStyleSheets) {
+                if (styleName.isBlank()) {
+                    continue;
+                }
                 String styleUri = skinAssets
                         .toPath()
                         .resolve(styleName)

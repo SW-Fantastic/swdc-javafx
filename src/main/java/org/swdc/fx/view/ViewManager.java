@@ -59,14 +59,15 @@ public class ViewManager implements DependencyScope {
         Theme theme = new Theme(themeName,resources.getAssetsFolder());
         theme.applyWithView(view);
 
-        boolean isCell = description.getProperty(boolean.class,"cell");
+        Boolean isCell = description.getProperty(Boolean.class,"cell");
         if (!isCell) {
             Stage stage = new Stage();
             stage.setTitle(description.getProperty(String.class,"title"));
-            stage.setResizable(description.getProperty(boolean.class,"resizeable"));
+            stage.setResizable(description.getProperty(Boolean.class,"resizeable"));
             stage.initStyle(description.getProperty(StageStyle.class,"windowStyle"));
-            boolean isDialog = description.getProperty(boolean.class,"dialog");
+            Boolean isDialog = description.getProperty(Boolean.class,"dialog");
             Class parent = description.getProperty(Class.class,"dialogParent");
+            stage.getIcons().addAll(resources.getIcons());
             if (!parent.equals(Object.class) && isDialog) {
                 AbstractView parentView = (AbstractView) this.context.getByClass(parent);
                 if (parentView != null) {
@@ -102,21 +103,29 @@ public class ViewManager implements DependencyScope {
         if (!AbstractView.class.isAssignableFrom(clazz)) {
             throw new RuntimeException("不是一个View：" + clazz.getName());
         }
-        FutureTask<T> task = new FutureTask<>(() -> this.initialize(clazz,component));
-        try {
-            Platform.runLater(task);
-            T target = task.get();
-            List<AbstractView> list = views.getOrDefault(clazz,new ArrayList<>());
-            list.add((AbstractView) target);
-            views.put(clazz,list);
-
-            if (!name.equals(clazz.getName())) {
-                namedViews.put(name,(AbstractView) component);
+        T target = null;
+        if (Platform.isFxApplicationThread()){
+            target = this.initialize(clazz,component);
+        } else {
+            try {
+                FutureTask<T> task = new FutureTask<>(() -> this.initialize(clazz,component));
+                Platform.runLater(task);
+                target = task.get();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            return target;
-        } catch (Exception e) {
+        }
+        if (target == null) {
             return null;
         }
+        List<AbstractView> list = views.getOrDefault(clazz,new ArrayList<>());
+        list.add((AbstractView) target);
+        views.put(clazz,list);
+
+        if (!name.equals(clazz.getName())) {
+            namedViews.put(name,(AbstractView) component);
+        }
+        return target;
     }
 
     @Override

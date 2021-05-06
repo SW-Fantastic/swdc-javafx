@@ -5,7 +5,7 @@ import javafx.stage.Stage;
 
 public abstract class SplashView {
 
-    private FXResources resources;
+    protected FXResources resources;
 
     public SplashView(FXResources resources) {
         this.resources = resources;

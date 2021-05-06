@@ -1,4 +1,4 @@
-module application.fx {
+module swdc.application.fx {
 
     requires swdc.application.configs;
     requires swdc.application.dependency;
@@ -8,10 +8,11 @@ module application.fx {
     requires javafx.web;
     requires jakarta.inject;
     requires lesscss.engine;
-    requires static swt;
 
     exports org.swdc.fx.config;
     exports org.swdc.fx.view;
     exports org.swdc.fx;
+
+    opens org.swdc.fx.config to swdc.application.configs;
 
 }

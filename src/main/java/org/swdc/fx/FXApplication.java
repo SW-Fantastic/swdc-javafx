@@ -33,7 +33,6 @@ public abstract class FXApplication extends Application implements SWApplication
 
     private FXResources resources;
     private DependencyContext context;
-    private transient SWTPlatform swtPlatform;
 
     private static LinkedBlockingQueue<Runnable> tasks = new LinkedBlockingQueue<>();
 
@@ -58,9 +57,6 @@ public abstract class FXApplication extends Application implements SWApplication
             ctx.close();
         }
         ApplicationHolder.onStop(this.getClass());
-        if (this.swtPlatform != null) {
-            this.swtPlatform.close();
-        }
         asyncPool.shutdown();
     }
 
@@ -93,12 +89,13 @@ public abstract class FXApplication extends Application implements SWApplication
         Layer layer = new Layer(context);
         this.onLaunch(layer);
         // 加载其他的环境层
-        ServiceLoader<LayerLoader> layerLoaders = ServiceLoader.load(LayerLoader.class);
+        // FIXME 不知道为什么这里无法加载Service
+        /*ServiceLoader<LayerLoader> layerLoaders = ServiceLoader.load(LayerLoader.class);
         for (LayerLoader layerLoader: layerLoaders) {
             layerLoader.setEnvironmentModule(this.getClass().getModule());
             DependencyContext ctx = layerLoader.load();
             layer.based(ctx);
-        }
+        }*/
         return layer.asContext();
     }
 
@@ -137,9 +134,6 @@ public abstract class FXApplication extends Application implements SWApplication
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-        if (this.swtPlatform != null) {
-            loader.withInstance(SWTPlatform.class,swtPlatform);
         }
         loader.withInstance(FXResources.class,resources);
         loader.withInstance(ThreadPoolExecutor.class,asyncPool);
@@ -202,17 +196,5 @@ public abstract class FXApplication extends Application implements SWApplication
         while (application == null) {
             application = ApplicationHolder.getApplication(this.getClass());
         }
-        try {
-            Class.forName("org.eclipse.swt.SWT");
-            SWTPlatform platform = new SWTPlatform();
-            application.swtPlatform = platform;
-            platform.eventLoop();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public SWTPlatform getSwtPlatform() {
-        return swtPlatform;
     }
 }
