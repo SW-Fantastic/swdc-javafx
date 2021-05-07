@@ -68,12 +68,8 @@ public class ViewManager implements DependencyScope {
             Boolean isDialog = description.getProperty(Boolean.class,"dialog");
             Class parent = description.getProperty(Class.class,"dialogParent");
             stage.getIcons().addAll(resources.getIcons());
-            if (!parent.equals(Object.class) && isDialog) {
-                AbstractView parentView = (AbstractView) this.context.getByClass(parent);
-                if (parentView != null) {
-                    stage.initOwner(parentView.getStage());
-                    stage.initModality(Modality.APPLICATION_MODAL);
-                }
+            if (isDialog) {
+                stage.initModality(Modality.APPLICATION_MODAL);
             }
             view.setStage(stage);
         }

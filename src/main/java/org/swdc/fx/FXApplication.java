@@ -17,6 +17,8 @@ import org.swdc.dependency.utils.AnnotationUtil;
 import org.swdc.fx.config.ApplicationConfig;
 import org.swdc.fx.config.ConfigFormat;
 import org.swdc.fx.config.ConfigureSource;
+import org.swdc.fx.font.FontawsomeService;
+import org.swdc.fx.font.MaterialIconsService;
 
 import java.io.Closeable;
 import java.io.File;
@@ -138,6 +140,8 @@ public abstract class FXApplication extends Application implements SWApplication
         loader.withInstance(FXResources.class,resources);
         loader.withInstance(ThreadPoolExecutor.class,asyncPool);
         loader.withInstance(FXApplication.class,this);
+        loader.withInstance(FontawsomeService.class,new FontawsomeService());
+        loader.withInstance(MaterialIconsService.class,new MaterialIconsService());
         return loader;
     }
 

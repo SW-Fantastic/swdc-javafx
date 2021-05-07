@@ -12,6 +12,9 @@ module swdc.application.fx {
     exports org.swdc.fx.config;
     exports org.swdc.fx.view;
     exports org.swdc.fx;
+    exports org.swdc.fx.font;
+
+    opens fonts;
 
     opens org.swdc.fx.config to swdc.application.configs;
 

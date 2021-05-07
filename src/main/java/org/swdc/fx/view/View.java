@@ -30,12 +30,6 @@ public @interface View {
     boolean dialog() default false;
 
     /**
-     * 指定Dialog的ParentView
-     * @return
-     */
-    Class dialogParent() default Object.class;
-
-    /**
      * 是否为某些view的单元格，如果为true，
      * 那么此view不为单例，不缓存
      * @return

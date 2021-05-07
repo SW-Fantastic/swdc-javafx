@@ -45,6 +45,14 @@ publishing {
     }
 }
 
+task copyResources(type: Copy) {
+    from sourceSets.main.resources
+    into sourceSets.main.java.outputDir
+    processResources.exclude("**/*.*")
+}
+
+processResources.dependsOn copyResources
+
 compileJava {
     options.compilerArgs += ['--module-path', classpath.asPath]
 }

@@ -3,8 +3,14 @@ package org.swdc.fx.view;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SplitPane;
+import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+
+import java.util.List;
 
 public abstract class AbstractView {
 
@@ -53,7 +59,7 @@ public abstract class AbstractView {
         this.controller = controller;
     }
 
-    Stage getStage() {
+    public Stage getStage() {
         return stage;
     }
 
@@ -64,4 +70,76 @@ public abstract class AbstractView {
     public <T> T getController() {
         return (T)controller;
     }
+
+    public <T> T findById(String id) {
+        T look = (T) (this.getView()).lookup("#" + id);
+        if (look != null) {
+            return look;
+        }
+        if (view instanceof SplitPane) {
+            return findById(id,view);
+        }
+        if (Parent.class.isAssignableFrom(view.getClass())) {
+            List<Node> childs = ((Parent)view).getChildrenUnmodifiable();
+            for (Node node : childs){
+                if (id.equals(node.getId())) {
+                    return (T)node;
+                } else {
+                    T target = findById(id,node);
+                    if (target != null) {
+                        return target;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private <T> T findById(String id, Node parent) {
+        if (parent instanceof ToolBar) {
+            ToolBar toolBar = (ToolBar) parent;
+            List<Node> tools = toolBar.getItems();
+            for (Node item: tools) {
+                if (id.equals(item.getId())) {
+                    return (T)item;
+                }
+            }
+            return null;
+        } else if (parent instanceof SplitPane) {
+            SplitPane splitPane = (SplitPane)parent;
+            for (Node item: splitPane.getItems()) {
+                if (id.equals(item.getId())) {
+                    return (T)item;
+                } else {
+                    Node target = findById(id,item);
+                    if (target != null) {
+                        return (T) target;
+                    }
+                }
+            }
+            return null;
+        } else if (parent instanceof ScrollPane) {
+            ScrollPane scrollPane = (ScrollPane)parent;
+            if (scrollPane.getContent().getId().equals(id)) {
+                return (T)scrollPane.getContent();
+            } else {
+                return findById(id,scrollPane.getContent());
+            }
+        } else if (parent instanceof Pane) {
+            Pane pane = (Pane)parent;
+            for (Node node: pane.getChildren()) {
+                if (id.equals(node.getId())) {
+                    return (T)node;
+                } else {
+                    Node next = findById(id, node);
+                    if (next != null) {
+                        return (T)next;
+                    }
+                }
+            }
+            return null;
+        }
+        return null;
+    }
+
 }
