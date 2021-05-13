@@ -56,7 +56,7 @@ public class ViewManager implements DependencyScope {
         ApplicationConfig config = context.getByClass(resources.getDefaultConfig());
         String themeName = config.getTheme();
 
-        Theme theme = new Theme(themeName,resources.getAssetsFolder());
+        Theme theme = Theme.getTheme(themeName,resources.getAssetsFolder());
         theme.applyWithView(view);
 
         Boolean isCell = description.getProperty(Boolean.class,"cell");

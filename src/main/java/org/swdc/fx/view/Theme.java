@@ -3,18 +3,29 @@ package org.swdc.fx.view;
 import com.asual.lesscss.LessEngine;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.swdc.dependency.utils.AnnotationDescription;
 import org.swdc.dependency.utils.AnnotationUtil;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Theme {
+
+    private static final Logger logger = LoggerFactory.getLogger(Theme.class);
+
+    private static Map<String,Theme> themes = new ConcurrentHashMap<>();
 
     private String name;
 
     private File assetsRoot;
+
+    private boolean ready;
 
     public Theme(String name, File assets) {
         this.name = name;
@@ -46,8 +57,17 @@ public class Theme {
                     }
                     LessEngine lessEngine = new LessEngine();
                     lessEngine.compile(file,css);
+                } else if (file.isFile() &&
+                        (file.getName().toLowerCase().endsWith("ttf") || file.getName().toLowerCase().endsWith("otf"))) {
+                    try {
+                        Font font = Font.loadFont(file.toPath().toUri().toURL().toExternalForm(),12.0);
+                        logger.info(" font :" + font.getFamily() + " loaded");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
+            this.ready = true;
         } catch (Exception e) {
             throw new RuntimeException("less编译失败：",e);
         }
@@ -58,7 +78,9 @@ public class Theme {
      * @param view
      */
     public void applyWithView(AbstractView view) {
-        this.prepare();
+        if (!this.ready) {
+            this.prepare();
+        }
 
         File skinAssets = assetsRoot.toPath()
                 .resolve("skin")
@@ -122,6 +144,15 @@ public class Theme {
         } catch (Exception e){
             throw new RuntimeException("渲染出现异常：",e);
         }
+    }
+
+    public static Theme getTheme(String name,File assets) {
+        if (themes.containsKey(name)) {
+            return themes.get(name);
+        }
+        Theme theme = new Theme(name,assets);
+        themes.put(name,theme);
+        return theme;
     }
 
 }

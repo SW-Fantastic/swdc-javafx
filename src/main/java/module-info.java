@@ -8,6 +8,7 @@ module swdc.application.fx {
     requires javafx.web;
     requires jakarta.inject;
     requires lesscss.engine;
+    requires slf4j.api;
 
     exports org.swdc.fx.config;
     exports org.swdc.fx.view;
@@ -15,6 +16,7 @@ module swdc.application.fx {
     exports org.swdc.fx.font;
 
     opens fonts;
+    opens banner;
 
     opens org.swdc.fx.config to swdc.application.configs;
 

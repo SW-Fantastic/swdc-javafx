@@ -4,11 +4,14 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.swdc.config.AbstractConfig;
 import org.swdc.config.Configure;
 import org.swdc.dependency.AnnotationLoader;
 import org.swdc.dependency.DependencyContext;
 import org.swdc.dependency.EnvironmentLoader;
+import org.swdc.dependency.LoggerProvider;
 import org.swdc.dependency.application.SWApplication;
 import org.swdc.dependency.layer.Layer;
 import org.swdc.dependency.layer.LayerLoader;
@@ -19,11 +22,14 @@ import org.swdc.fx.config.ConfigFormat;
 import org.swdc.fx.config.ConfigureSource;
 import org.swdc.fx.font.FontawsomeService;
 import org.swdc.fx.font.MaterialIconsService;
+import org.swdc.fx.util.ApplicationIOUtil;
 
 import java.io.Closeable;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import java.nio.channels.Channels;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.*;
@@ -35,6 +41,8 @@ public abstract class FXApplication extends Application implements SWApplication
 
     private FXResources resources;
     private DependencyContext context;
+
+    protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private static LinkedBlockingQueue<Runnable> tasks = new LinkedBlockingQueue<>();
 
@@ -50,6 +58,7 @@ public abstract class FXApplication extends Application implements SWApplication
 
     @Override
     public void stop() throws Exception {
+        logger.info(" application closing...");
         this.onShutdown(context);
         if (context instanceof Closeable){
             Closeable ctx = (Closeable) context;
@@ -60,10 +69,13 @@ public abstract class FXApplication extends Application implements SWApplication
         }
         ApplicationHolder.onStop(this.getClass());
         asyncPool.shutdown();
+        logger.info(" application has been shutdown");
     }
 
     @Override
     public void start(Stage stage) throws Exception {
+
+        logger.info(" load splash stage");
 
         SplashView view = (SplashView) resources.getSplash()
                 .getConstructor(new Class[]{ FXResources.class })
@@ -79,8 +91,10 @@ public abstract class FXApplication extends Application implements SWApplication
                 .thenApplyAsync(ctx -> this.context = ctx,asyncPool)
                 .thenApply((ctx) -> {
                     Platform.runLater(() -> {
-                        window.close();
+                        logger.info(" application ready.");
                         this.onStarted(ctx);
+                        logger.info(" application started.");
+                        window.close();
                     });
                     return ctx;
                 });
@@ -137,6 +151,8 @@ public abstract class FXApplication extends Application implements SWApplication
                 e.printStackTrace();
             }
         }
+        logger.info(" config loaded.");
+        loader.withProvider(LoggerProvider.class);
         loader.withInstance(FXResources.class,resources);
         loader.withInstance(ThreadPoolExecutor.class,asyncPool);
         loader.withInstance(FXApplication.class,this);
@@ -147,20 +163,33 @@ public abstract class FXApplication extends Application implements SWApplication
 
     @Override
     public void init() throws Exception {
+
+        InputStream bannerInput = this.getClass().getModule().getResourceAsStream("banner/banner.txt");
+        if (bannerInput == null) {
+            bannerInput = FXApplication.class.getModule().getResourceAsStream("banner/banner.txt");
+        }
+        String banner = ApplicationIOUtil.readStreamAsString(bannerInput);
+        System.out.println(banner);
+        bannerInput.close();
+        logger.info(" Application initializing..");
+
         ApplicationHolder.onLaunched(this.getClass(),this);
         Map<Class, AnnotationDescription> annotations = AnnotationUtil.getAnnotations(this.getClass());
         AnnotationDescription appDesc = AnnotationUtil.findAnnotationIn(annotations,SWFXApplication.class);
-        System.out.println(appDesc.getProperty(String.class,"assetsFolder"));
+        logger.info(" using assets: " + appDesc.getProperty(String.class,"assetsFolder"));
         Class[] configs = appDesc.getProperty(Class[].class,"configs");
         Class splash = appDesc.getProperty(Class.class,"splash");
         File file = new File(appDesc.getProperty(String.class,"assetsFolder"));
 
+        logger.info(" dependency environment loading...");
         Optional<Class> config = Stream.of(configs)
                 .filter(ApplicationConfig.class::isAssignableFrom).findAny();
 
         if (config.isEmpty()) {
-            throw new RuntimeException("请在SWFXApplication注解的configs里面添加一个继承自" +
+            RuntimeException ex = new RuntimeException("请在SWFXApplication注解的configs里面添加一个继承自" +
                     "ApplicationConfig的配置类，来为应用提供Theme");
+            logger.error(" 启动失败",ex);
+            throw ex;
         }
 
         String[] icons = appDesc.getProperty(String[].class,"icons");
@@ -183,6 +212,7 @@ public abstract class FXApplication extends Application implements SWApplication
 
         this.asyncPool = new ThreadPoolExecutor(1,3,30, TimeUnit.MINUTES,new LinkedBlockingQueue<>());
 
+        logger.info(" javafx initializing...");
     }
 
     @Override
