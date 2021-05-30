@@ -1,7 +1,5 @@
 module swdc.application.fx {
 
-    requires swdc.application.configs;
-    requires swdc.application.dependency;
     requires javafx.graphics;
     requires javafx.fxml;
     requires javafx.controls;
@@ -9,6 +7,8 @@ module swdc.application.fx {
     requires jakarta.inject;
     requires lesscss.engine;
     requires slf4j.api;
+    requires swdc.application.dependency;
+    requires swdc.application.configs;
 
     exports org.swdc.fx.config;
     exports org.swdc.fx.view;
