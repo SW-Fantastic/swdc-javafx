@@ -3,9 +3,7 @@ package org.swdc.fx.view;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -138,6 +136,15 @@ public abstract class AbstractView {
                 }
             }
             return null;
+        } else if (parent instanceof TabPane) {
+            List<Tab> tabs = ((TabPane) parent).getTabs();
+            for (Tab tab: tabs) {
+                T target = this.findById(id,tab.getContent());
+                if (target != null) {
+                    return target;
+                }
+                return null;
+            }
         }
         return null;
     }
