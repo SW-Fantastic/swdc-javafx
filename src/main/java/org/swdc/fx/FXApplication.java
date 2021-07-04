@@ -7,19 +7,15 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.swdc.config.AbstractConfig;
-import org.swdc.config.Configure;
 import org.swdc.dependency.AnnotationLoader;
 import org.swdc.dependency.DependencyContext;
 import org.swdc.dependency.EnvironmentLoader;
 import org.swdc.dependency.LoggerProvider;
 import org.swdc.dependency.application.SWApplication;
 import org.swdc.dependency.layer.Layer;
-import org.swdc.dependency.layer.LayerLoader;
 import org.swdc.dependency.utils.AnnotationDescription;
 import org.swdc.dependency.utils.AnnotationUtil;
 import org.swdc.fx.config.ApplicationConfig;
-import org.swdc.fx.config.ConfigFormat;
-import org.swdc.fx.config.ConfigureSource;
 import org.swdc.fx.font.FontawsomeService;
 import org.swdc.fx.font.MaterialIconsService;
 import org.swdc.fx.util.ApplicationIOUtil;
@@ -28,8 +24,6 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
-import java.nio.channels.Channels;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.*;
@@ -117,38 +111,13 @@ public abstract class FXApplication extends Application implements SWApplication
 
     private AnnotationLoader loadConfigs(AnnotationLoader loader) {
         this.onConfig(loader);
-        File folder = this.resources.getAssetsFolder();
         List<Class> configures = resources.getConfigures();
         for (Class conf: configures) {
-            ConfigureSource source = (ConfigureSource) conf.getAnnotation(ConfigureSource.class);
-            if (source == null) {
-                continue;
-            }
-            String path = source.value();
-            ConfigFormat format = source.format();
-            Path configFilePath = folder.toPath().resolve(path);
             try {
-                AbstractConfig config;
-                if (source.external()) {
-                    Constructor<? extends AbstractConfig> constructor = format.getConfigClass().getConstructor(File.class);
-                    config = constructor.newInstance(configFilePath.toFile());
-                } else {
-                    Constructor<? extends AbstractConfig> constructor = format.getConfigClass().getConstructor(InputStream.class);
-                    InputStream in = this.getClass().getModule().getResourceAsStream(path);
-                    if (in != null) {
-                        config = constructor.newInstance(in);
-                    } else {
-                        continue;
-                    }
-                }
-
-                Object confInstance = conf
-                        .getConstructor(Configure.class)
-                        .newInstance(config);
-
+                AbstractConfig confInstance = (AbstractConfig) conf.getConstructor().newInstance();
                 loader.withInstance(conf,confInstance);
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
         logger.info(" config loaded.");

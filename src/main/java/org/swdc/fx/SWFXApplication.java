@@ -1,6 +1,6 @@
 package org.swdc.fx;
 
-import org.swdc.config.AbstractConfigure;
+import org.swdc.config.AbstractConfig;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -27,7 +27,7 @@ public @interface SWFXApplication {
      * 用户的外部配置类
      * @return
      */
-    Class<? extends AbstractConfigure>[] configs();
+    Class<? extends AbstractConfig>[] configs();
 
     /**
      * 图标资源的名称

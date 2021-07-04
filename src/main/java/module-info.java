@@ -9,6 +9,8 @@ module swdc.application.fx {
     requires slf4j.api;
     requires swdc.application.dependency;
     requires swdc.application.configs;
+    requires org.controlsfx.controls;
+    requires java.desktop;
 
     exports org.swdc.fx.config;
     exports org.swdc.fx.view;
