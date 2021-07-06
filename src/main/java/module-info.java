@@ -13,6 +13,7 @@ module swdc.application.fx {
     requires java.desktop;
 
     exports org.swdc.fx.config;
+    exports org.swdc.fx.config.editors;
     exports org.swdc.fx.view;
     exports org.swdc.fx;
     exports org.swdc.fx.font;
