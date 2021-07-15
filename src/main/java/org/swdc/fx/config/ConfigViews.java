@@ -7,9 +7,9 @@ import org.controlsfx.control.PropertySheet;
 import org.controlsfx.property.editor.PropertyEditor;
 import org.swdc.config.AbstractConfig;
 import org.swdc.config.annotations.Property;
+import org.swdc.fx.FXResources;
 
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Optional;
@@ -53,10 +53,12 @@ public class ConfigViews {
     }
 
 
-    public static Callback<PropertySheet.Item,PropertyEditor<?>> factory() {
+    public static Callback<PropertySheet.Item,PropertyEditor<?>> factory(FXResources resources) {
         return (item) -> {
             if (ConfigPropertiesItem.class.isAssignableFrom(item.getClass())) {
-                return createEditor((ConfigPropertiesItem) item);
+                PropertyEditor editor = createEditor((ConfigPropertiesItem) item);
+                ((PropEditorView)editor).setResources(resources);
+                return editor;
             }
             throw new RuntimeException("Item必须为ConfigPropertiesItem类型");
         };

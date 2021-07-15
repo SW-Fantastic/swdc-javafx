@@ -2,6 +2,7 @@ package org.swdc.fx.config;
 
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.property.editor.PropertyEditor;
+import org.swdc.fx.FXResources;
 
 /**
  * View，这个是显示配置或者属性编辑器的那个view，
@@ -12,11 +13,21 @@ public abstract class PropEditorView implements PropertyEditor {
 
     private ConfigPropertiesItem item;
 
+    private FXResources resources;
+
     public PropEditorView(PropertySheet.Item item) {
         if (!ConfigPropertiesItem.class.isAssignableFrom(item.getClass())) {
             throw new RuntimeException("item 必须为ConfigPropertiesItem类的对象。");
         }
         this.item = (ConfigPropertiesItem) item;
+    }
+
+    public void setResources(FXResources resources) {
+        this.resources = resources;
+    }
+
+    public FXResources getResources() {
+        return resources;
     }
 
     public PropEditorView(ConfigPropertiesItem item) {

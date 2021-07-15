@@ -21,7 +21,7 @@ public @interface SWFXApplication {
      * Splash闪屏类
      * @return
      */
-    Class<? extends SplashView> splash();
+    Class<? extends Splash> splash();
 
     /**
      * 用户的外部配置类

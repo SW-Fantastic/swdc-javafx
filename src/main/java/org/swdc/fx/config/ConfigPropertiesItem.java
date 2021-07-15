@@ -1,15 +1,10 @@
 package org.swdc.fx.config;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import org.controlsfx.property.BeanProperty;
 import org.controlsfx.property.editor.PropertyEditor;
-import org.swdc.config.AbstractConfig;
-import org.swdc.config.annotations.Property;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
-import java.util.Map;
 import java.util.Optional;
 
 public class ConfigPropertiesItem extends BeanProperty {
@@ -40,6 +35,11 @@ public class ConfigPropertiesItem extends BeanProperty {
     @Override
     public Optional<Class<? extends PropertyEditor<?>>> getPropertyEditorClass() {
         return Optional.of(this.editor.editor());
+    }
+
+
+    public PropEditor getEditorInfo() {
+        return this.editor;
     }
 
 

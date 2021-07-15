@@ -12,7 +12,6 @@ import org.swdc.dependency.DependencyContext;
 import org.swdc.dependency.EnvironmentLoader;
 import org.swdc.dependency.LoggerProvider;
 import org.swdc.dependency.application.SWApplication;
-import org.swdc.dependency.layer.Layer;
 import org.swdc.dependency.utils.AnnotationDescription;
 import org.swdc.dependency.utils.AnnotationUtil;
 import org.swdc.fx.config.ApplicationConfig;
@@ -23,8 +22,6 @@ import org.swdc.fx.util.ApplicationIOUtil;
 import java.io.Closeable;
 import java.io.File;
 import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Stream;
@@ -45,10 +42,6 @@ public abstract class FXApplication extends Application implements SWApplication
 
     }
 
-    @Override
-    public void onLaunch(Layer layer) {
-
-    }
 
     @Override
     public void stop() throws Exception {
@@ -64,6 +57,7 @@ public abstract class FXApplication extends Application implements SWApplication
         ApplicationHolder.onStop(this.getClass());
         asyncPool.shutdown();
         logger.info(" application has been shutdown");
+        System.exit(0);
     }
 
     @Override
@@ -71,43 +65,27 @@ public abstract class FXApplication extends Application implements SWApplication
 
         logger.info(" load splash stage");
 
-        SplashView view = (SplashView) resources.getSplash()
+        Splash view = (Splash) resources.getSplash()
                 .getConstructor(new Class[]{ FXResources.class })
                 .newInstance(resources);
 
-        Stage window = view.getSplash();
-        window.show();
+        view.show();
 
         AnnotationLoader loader = new AnnotationLoader();
         CompletableFuture
                 .supplyAsync(() -> this.loadConfigs(loader),asyncPool)
-                .thenApplyAsync(this::loadLayers,asyncPool)
-                .thenApplyAsync(ctx -> this.context = ctx,asyncPool)
+                .thenApplyAsync(ctx -> this.context = ctx.load(),asyncPool)
                 .thenApply((ctx) -> {
                     Platform.runLater(() -> {
                         logger.info(" application ready.");
                         this.onStarted(ctx);
                         logger.info(" application started.");
-                        window.close();
+                        view.hide();
                     });
                     return ctx;
                 });
     }
 
-    private DependencyContext loadLayers(AnnotationLoader loader) {
-        DependencyContext context = loader.load();
-        Layer layer = new Layer(context);
-        this.onLaunch(layer);
-        // 加载其他的环境层
-        // FIXME 不知道为什么这里无法加载Service
-        /*ServiceLoader<LayerLoader> layerLoaders = ServiceLoader.load(LayerLoader.class);
-        for (LayerLoader layerLoader: layerLoaders) {
-            layerLoader.setEnvironmentModule(this.getClass().getModule());
-            DependencyContext ctx = layerLoader.load();
-            layer.based(ctx);
-        }*/
-        return layer.asContext();
-    }
 
     private AnnotationLoader loadConfigs(AnnotationLoader loader) {
         this.onConfig(loader);
@@ -179,7 +157,7 @@ public abstract class FXApplication extends Application implements SWApplication
         resources.setSplash(splash);
         resources.setIcons(images);
 
-        this.asyncPool = new ThreadPoolExecutor(1,3,30, TimeUnit.MINUTES,new LinkedBlockingQueue<>());
+        this.asyncPool = new ThreadPoolExecutor(2,4,30, TimeUnit.MINUTES,new LinkedBlockingQueue<>());
 
         logger.info(" javafx initializing...");
     }

@@ -56,8 +56,7 @@ public class ViewManager implements DependencyScope {
         ApplicationConfig config = context.getByClass(resources.getDefaultConfig());
         String themeName = config.getTheme();
 
-        Theme theme = Theme.getTheme(themeName,resources.getAssetsFolder());
-        theme.applyWithView(view);
+
 
         Boolean isCell = description.getProperty(Boolean.class,"cell");
         if (!isCell) {
@@ -74,6 +73,8 @@ public class ViewManager implements DependencyScope {
             view.setStage(stage);
         }
 
+        Theme theme = Theme.getTheme(themeName,resources.getAssetsFolder());
+        theme.applyWithView(view);
 
         return (T)view;
     }

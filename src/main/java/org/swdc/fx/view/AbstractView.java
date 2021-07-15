@@ -18,6 +18,8 @@ public abstract class AbstractView {
 
     private Node view;
 
+    private Toast toast;
+
     public Node render() {
         return view;
     }
