@@ -7,10 +7,14 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.swdc.dependency.EventAcceptable;
+import org.swdc.dependency.event.AbstractEvent;
+import org.swdc.dependency.event.Events;
+import org.swdc.fx.StageCloseEvent;
 
 import java.util.List;
 
-public abstract class AbstractView {
+public abstract class AbstractView implements EventAcceptable {
 
     private Object controller;
 
@@ -19,6 +23,8 @@ public abstract class AbstractView {
     private Node view;
 
     private Toast toast;
+
+    private Events events;
 
     public Node render() {
         return view;
@@ -49,6 +55,14 @@ public abstract class AbstractView {
             stage.setScene(new Scene(new BorderPane(view)));
         }
         this.stage = stage;
+        this.stage.setOnHidden((e) -> {
+            this.emit(new StageCloseEvent(this.getClass()));
+            this.closed();
+        });
+    }
+
+    protected void closed() {
+
     }
 
     void setView(Node view) {
@@ -65,6 +79,15 @@ public abstract class AbstractView {
 
     public Node getView() {
         return view;
+    }
+
+    @Override
+    public void setEvents(Events events) {
+        this.events = events;
+    }
+
+    public <T extends AbstractEvent> void emit(T event) {
+        this.events.dispatch(event);
     }
 
     public <T> T getController() {
