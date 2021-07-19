@@ -34,7 +34,7 @@ public @interface View {
      * 那么此view不为单例，不缓存
      * @return
      */
-    boolean cell() default false;
+    boolean stage() default true;
 
     /**
      * stage的title
@@ -67,5 +67,7 @@ public @interface View {
     boolean closeable() default true;
 
     String background() default "";
+
+    boolean multiple() default  false;
 
 }

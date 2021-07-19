@@ -22,9 +22,9 @@ public abstract class AbstractView implements EventAcceptable {
 
     private Node view;
 
-    private Toast toast;
-
     private Events events;
+
+    private Theme theme;
 
     public Node render() {
         return view;
@@ -172,6 +172,21 @@ public abstract class AbstractView implements EventAcceptable {
             }
         }
         return null;
+    }
+
+    public Alert alert(String title,String message, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setContentText(message);
+        alert.setHeaderText(null);
+        alert.setTitle(title);
+
+        theme.applyWithAlert(alert);
+
+        return alert;
+    }
+
+    void setTheme(Theme theme) {
+        this.theme = theme;
     }
 
 }

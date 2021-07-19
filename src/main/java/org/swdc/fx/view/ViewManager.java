@@ -54,12 +54,10 @@ public class ViewManager implements DependencyScope {
         // 应用theme
         FXResources resources = context.getByClass(FXResources.class);
         ApplicationConfig config = context.getByClass(resources.getDefaultConfig());
-        String themeName = config.getTheme();
 
 
-
-        Boolean isCell = description.getProperty(Boolean.class,"cell");
-        if (!isCell) {
+        Boolean isStage = description.getProperty(Boolean.class,"stage");
+        if (isStage) {
             Stage stage = new Stage();
             stage.setTitle(description.getProperty(String.class,"title"));
             stage.setResizable(description.getProperty(Boolean.class,"resizeable"));
@@ -73,8 +71,10 @@ public class ViewManager implements DependencyScope {
             view.setStage(stage);
         }
 
+        String themeName = config.getTheme();
         Theme theme = Theme.getTheme(themeName,resources.getAssetsFolder());
         theme.applyWithView(view);
+        view.setTheme(theme);
 
         return (T)view;
     }
@@ -132,7 +132,17 @@ public class ViewManager implements DependencyScope {
 
     @Override
     public <T> T getByClass(Class<T> clazz) {
-        return (T)views.get(clazz);
+        List<AbstractView> exists =  views.get(clazz);
+        if (exists == null || exists.size() == 0) {
+            return null;
+        }
+        View view = clazz.getAnnotation(View.class);
+        if (exists.size() > 1 && !view.multiple()) {
+            throw new RuntimeException("多个相同的view，请使用getByAbstract");
+        } else if (view.multiple()) {
+            return null;
+        }
+        return (T)exists.get(0);
     }
 
     @Override
@@ -152,4 +162,55 @@ public class ViewManager implements DependencyScope {
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
     }
+
+    /**
+     * 创建一个不在环境中的view，
+     * 如果一些特殊的需求，不允许view处于环境中,例如在应用中动态创建
+     * 而不是通过注入获取。
+     *
+     * @param clazz
+     * @param <T>
+     * @return
+     */
+    public static <T extends AbstractView> T createView(Class<T> clazz) {
+        try {
+            T view = clazz.getConstructor().newInstance();
+            AnnotationDescription description = AnnotationUtil.findAnnotation(clazz,View.class);
+            String fxml = description.getProperty(String.class,"viewLocation");
+            if (!fxml.isBlank()) {
+                try {
+                    InputStream inputStream = clazz.getModule().getResourceAsStream(fxml);
+                    if (inputStream == null){
+                        throw new RuntimeException("找不到fxml：" + fxml);
+                    }
+                    // 加载fxml
+                    FXMLLoader loader = new FXMLLoader();
+                    Parent parent = loader.load(inputStream);
+                    view.setView(parent);
+
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            Boolean isStage = description.getProperty(Boolean.class,"stage");
+            if (isStage) {
+                Stage stage = new Stage();
+                stage.setTitle(description.getProperty(String.class,"title"));
+                stage.setResizable(description.getProperty(Boolean.class,"resizeable"));
+                stage.initStyle(description.getProperty(StageStyle.class,"windowStyle"));
+                Boolean isDialog = description.getProperty(Boolean.class,"dialog");
+                if (isDialog) {
+                    stage.initModality(Modality.APPLICATION_MODAL);
+                }
+                view.setStage(stage);
+            }
+
+            return view;
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

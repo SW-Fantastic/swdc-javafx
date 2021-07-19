@@ -3,6 +3,7 @@ package org.swdc.fx.view;
 import com.asual.lesscss.LessEngine;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
@@ -143,6 +144,30 @@ public class Theme {
             root.setStyle("-fx-background-image: url(" + backgroundUri + ");" );
         } catch (Exception e){
             throw new RuntimeException("渲染出现异常：",e);
+        }
+    }
+
+    public void applyWithAlert(Alert alert) {
+        if (!this.ready) {
+            this.prepare();
+        }
+
+        File skinAssets = assetsRoot.toPath()
+                .resolve("skin")
+                .resolve(this.name)
+                .toFile();
+
+        try {
+            String defaultStyle = skinAssets
+                    .toPath()
+                    .resolve("stage.css")
+                    .toUri()
+                    .toURL()
+                    .toExternalForm();
+
+            alert.getDialogPane().getStylesheets().add(defaultStyle);
+        }catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
