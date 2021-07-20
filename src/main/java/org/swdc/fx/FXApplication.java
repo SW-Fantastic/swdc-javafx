@@ -159,6 +159,7 @@ public abstract class FXApplication extends Application implements SWApplication
 
         this.asyncPool = new ThreadPoolExecutor(2,4,30, TimeUnit.MINUTES,new LinkedBlockingQueue<>());
 
+        resources.setExecutor(asyncPool);
         logger.info(" javafx initializing...");
     }
 

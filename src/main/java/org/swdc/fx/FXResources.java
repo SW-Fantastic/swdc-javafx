@@ -5,6 +5,7 @@ import org.swdc.fx.config.ApplicationConfig;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class FXResources {
 
@@ -18,7 +19,17 @@ public class FXResources {
 
     private List<String> args;
 
+    private ThreadPoolExecutor executor;
+
     private Class<? extends ApplicationConfig> defaultConfig;
+
+    public ThreadPoolExecutor getExecutor() {
+        return executor;
+    }
+
+    public void setExecutor(ThreadPoolExecutor executor) {
+        this.executor = executor;
+    }
 
     public void setDefaultConfig(Class<? extends ApplicationConfig> defaultConfig) {
         this.defaultConfig = defaultConfig;
