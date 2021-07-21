@@ -79,8 +79,8 @@ public abstract class FXApplication extends Application implements SWApplication
                     Platform.runLater(() -> {
                         logger.info(" application ready.");
                         this.onStarted(ctx);
-                        logger.info(" application started.");
                         view.hide();
+                        logger.info(" application started.");
                     });
                     return ctx;
                 });

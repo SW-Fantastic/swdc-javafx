@@ -1,7 +1,9 @@
 package org.swdc.fx.config;
 
 import org.controlsfx.control.PropertySheet;
+import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.property.editor.PropertyEditor;
+import org.swdc.config.converters.Converters;
 import org.swdc.fx.FXResources;
 
 /**
@@ -10,6 +12,10 @@ import org.swdc.fx.FXResources;
  * ui组件是否存在，这两个方法可以先于getEditor执行。
  */
 public abstract class PropEditorView implements PropertyEditor {
+
+    protected static FontAwesome fontAwesome = new FontAwesome();
+
+    protected Converters converters = new Converters();
 
     private ConfigPropertiesItem item;
 

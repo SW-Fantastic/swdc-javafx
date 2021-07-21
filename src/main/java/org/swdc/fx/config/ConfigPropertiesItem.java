@@ -37,6 +37,9 @@ public class ConfigPropertiesItem extends BeanProperty {
         return Optional.of(this.editor.editor());
     }
 
+    public Field getProp() {
+        return prop;
+    }
 
     public PropEditor getEditorInfo() {
         return this.editor;
