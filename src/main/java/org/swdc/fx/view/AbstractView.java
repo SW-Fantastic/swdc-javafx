@@ -55,9 +55,9 @@ public abstract class AbstractView implements EventEmitter {
             stage.setScene(new Scene(new BorderPane(view)));
         }
         this.stage = stage;
-        this.stage.setOnHidden((e) -> {
+        this.stage.setOnCloseRequest((e) -> {
             this.emit(new StageCloseEvent(this.getClass()));
-            this.closed();
+            this.hide();
         });
     }
 

@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.LockSupport;
 import java.util.stream.Stream;
 
 public abstract class FXApplication extends Application implements SWApplication {
@@ -46,6 +47,26 @@ public abstract class FXApplication extends Application implements SWApplication
     @Override
     public void stop() throws Exception {
         logger.info(" application closing...");
+
+        synchronized (this) {
+            while (asyncPool.getActiveCount() > 0) {
+                logger.info("waiting for threads complete...");
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        synchronized (FXApplication.this) {
+                            if (asyncPool.getActiveCount() == 0) {
+                                FXApplication.this.notify();
+                            }
+                        }
+                    }
+                },5000);
+                this.wait();
+                timer.cancel();
+            }
+        }
+
         this.onShutdown(context);
         if (context instanceof Closeable){
             Closeable ctx = (Closeable) context;
@@ -157,7 +178,7 @@ public abstract class FXApplication extends Application implements SWApplication
         resources.setSplash(splash);
         resources.setIcons(images);
 
-        this.asyncPool = new ThreadPoolExecutor(2,4,30, TimeUnit.MINUTES,new LinkedBlockingQueue<>());
+        this.asyncPool = new ThreadPoolExecutor(4,12,30, TimeUnit.MINUTES,new LinkedBlockingQueue<>());
 
         resources.setExecutor(asyncPool);
         logger.info(" javafx initializing...");

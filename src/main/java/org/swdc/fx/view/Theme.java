@@ -12,6 +12,7 @@ import org.swdc.dependency.utils.AnnotationDescription;
 import org.swdc.dependency.utils.AnnotationUtil;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -58,10 +59,11 @@ public class Theme {
                     }
                     LessEngine lessEngine = new LessEngine();
                     lessEngine.compile(file,css);
-                } else if (file.isFile() &&
-                        (file.getName().toLowerCase().endsWith("ttf") || file.getName().toLowerCase().endsWith("otf"))) {
+                } else if (file.isFile() && (
+                        file.getName().toLowerCase().endsWith("ttf") ||
+                                file.getName().toLowerCase().endsWith("otf"))) {
                     try {
-                        Font font = Font.loadFont(file.toPath().toUri().toURL().toExternalForm(),12.0);
+                        Font font = Font.loadFont(new FileInputStream(file),12.0);
                         logger.info(" font :" + font.getFamily() + " loaded");
                     } catch (Exception e) {
                         e.printStackTrace();
