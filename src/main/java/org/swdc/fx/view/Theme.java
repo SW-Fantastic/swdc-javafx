@@ -61,7 +61,8 @@ public class Theme {
                     lessEngine.compile(file,css);
                 } else if (file.isFile() && (
                         file.getName().toLowerCase().endsWith("ttf") ||
-                                file.getName().toLowerCase().endsWith("otf"))) {
+                                file.getName().toLowerCase().endsWith("otf")||
+                                file.getName().toLowerCase().endsWith("ttc"))) {
                     try {
                         Font font = Font.loadFont(new FileInputStream(file),12.0);
                         logger.info(" font :" + font.getFamily() + " loaded");

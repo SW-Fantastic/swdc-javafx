@@ -22,6 +22,9 @@ import org.swdc.fx.util.ApplicationIOUtil;
 import java.io.Closeable;
 import java.io.File;
 import java.io.InputStream;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.LockSupport;
@@ -147,7 +150,23 @@ public abstract class FXApplication extends Application implements SWApplication
         logger.info(" using assets: " + appDesc.getProperty(String.class,"assetsFolder"));
         Class[] configs = appDesc.getProperty(Class[].class,"configs");
         Class splash = appDesc.getProperty(Class.class,"splash");
-        File file = new File(appDesc.getProperty(String.class,"assetsFolder"));
+
+        File file = null;
+        String osName = System.getProperty("os.name").trim().toLowerCase();
+        logger.info(" starting at : " + osName);
+        if (osName.contains("mac")) {
+            String url = this.getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
+            String base = URLDecoder.decode(url, StandardCharsets.UTF_8);
+            if (base.indexOf(".app") > 0) {
+                // 位于MacOS的Bundle（.app软件包）内部，特殊处理以获取正确的路径。
+                String location = base.substring(0,base.indexOf(".app")) + ".app/Contents/";
+                Path target = new File(location).toPath();
+                target = target.resolve(appDesc.getProperty(String.class,"assetsFolder"));
+                file = target.toFile();
+            }
+        } else {
+            file = new File(appDesc.getProperty(String.class,"assetsFolder"));
+        }
 
         logger.info(" dependency environment loading...");
         Optional<Class> config = Stream.of(configs)
