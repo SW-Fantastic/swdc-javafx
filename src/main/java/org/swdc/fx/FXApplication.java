@@ -39,13 +39,10 @@ public abstract class FXApplication extends Application implements SWApplication
 
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private static LinkedBlockingQueue<Runnable> tasks = new LinkedBlockingQueue<>();
-
     @Override
     public void onConfig(EnvironmentLoader loader) {
 
     }
-
 
     @Override
     public void stop() throws Exception {
@@ -209,7 +206,6 @@ public abstract class FXApplication extends Application implements SWApplication
     }
 
     public void applicationLaunch(String ...args) throws ExecutionException, InterruptedException {
-
 
         Thread launcher = new Thread(()->Application.launch(this.getClass(),args));
         launcher.start();
