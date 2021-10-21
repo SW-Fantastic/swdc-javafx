@@ -7,6 +7,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.swdc.dependency.DependencyContext;
 import org.swdc.dependency.EventEmitter;
 import org.swdc.dependency.event.AbstractEvent;
 import org.swdc.dependency.event.Events;
@@ -25,6 +26,8 @@ public abstract class AbstractView implements EventEmitter {
     private Events events;
 
     private Theme theme;
+
+    private DependencyContext context;
 
     public Node render() {
         return view;
@@ -73,12 +76,21 @@ public abstract class AbstractView implements EventEmitter {
         this.controller = controller;
     }
 
+    void setContext(DependencyContext context) {
+        this.context = context;
+    }
+
     public Stage getStage() {
         return stage;
     }
 
     public Node getView() {
         return view;
+    }
+
+
+    public <T extends AbstractView> T getView(Class<T> view) {
+        return context.getByClass(view);
     }
 
     @Override
@@ -170,6 +182,13 @@ public abstract class AbstractView implements EventEmitter {
                     return target;
                 }
                 return null;
+            }
+        } else if (parent instanceof TableView) {
+            List<TableColumn> columns = ((TableView)parent).getColumns();
+            for (TableColumn column: columns) {
+                if (column.getId().equals(id)) {
+                    return (T)column;
+                }
             }
         }
         return null;

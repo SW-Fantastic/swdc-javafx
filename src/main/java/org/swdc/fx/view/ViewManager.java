@@ -63,7 +63,6 @@ public class ViewManager implements DependencyScope {
             stage.setResizable(description.getProperty(Boolean.class,"resizeable"));
             stage.initStyle(description.getProperty(StageStyle.class,"windowStyle"));
             Boolean isDialog = description.getProperty(Boolean.class,"dialog");
-            Class parent = description.getProperty(Class.class,"dialogParent");
             stage.getIcons().addAll(resources.getIcons());
             if (isDialog) {
                 stage.initModality(Modality.APPLICATION_MODAL);
@@ -75,6 +74,7 @@ public class ViewManager implements DependencyScope {
         Theme theme = Theme.getTheme(themeName,resources.getAssetsFolder());
         theme.applyWithView(view);
         view.setTheme(theme);
+        view.setContext(this.context);
 
         return (T)view;
     }
@@ -100,6 +100,7 @@ public class ViewManager implements DependencyScope {
         if (!AbstractView.class.isAssignableFrom(clazz)) {
             throw new RuntimeException("不是一个View：" + clazz.getName());
         }
+
         T target = null;
         if (Platform.isFxApplicationThread()){
             target = this.initialize(clazz,component);
@@ -115,6 +116,13 @@ public class ViewManager implements DependencyScope {
         if (target == null) {
             return null;
         }
+
+        AnnotationDescription desc = AnnotationUtil.findAnnotation(clazz,View.class);
+        boolean multipleViews = desc.getProperty(boolean.class,"multiple");
+        if (multipleViews) {
+            return target;
+        }
+
         List<AbstractView> list = views.getOrDefault(clazz,new ArrayList<>());
         list.add((AbstractView) target);
         views.put(clazz,list);
