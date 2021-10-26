@@ -12,6 +12,10 @@ module swdc.application.fx {
     requires org.controlsfx.controls;
     requires java.desktop;
 
+    requires com.fasterxml.jackson.core;
+    requires com.fasterxml.jackson.databind;
+    requires com.fasterxml.jackson.annotation;
+
     exports org.swdc.fx.config;
     exports org.swdc.fx.config.editors;
     exports org.swdc.fx.view;

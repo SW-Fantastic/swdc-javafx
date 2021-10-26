@@ -11,6 +11,7 @@ public class FontawsomeService  {
 
     private Map<String, Character> awesomeMap = new HashMap<>();
     private Map<FontSize, Font> fonts = new HashMap<>();
+
     private static final String location = "fonts/fontawesome.ttf";
 
 
