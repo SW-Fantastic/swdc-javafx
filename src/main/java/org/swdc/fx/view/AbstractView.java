@@ -29,13 +29,19 @@ public abstract class AbstractView implements EventEmitter {
 
     private DependencyContext context;
 
+    private boolean isDialog = false;
+
     public Node render() {
         return view;
     }
 
     public void show(){
         if (this.stage != null) {
-            this.stage.show();
+            if(!isDialog) {
+                this.stage.show();
+            } else {
+                this.stage.showAndWait();
+            }
         }
     }
 
@@ -203,6 +209,10 @@ public abstract class AbstractView implements EventEmitter {
         theme.applyWithAlert(alert);
 
         return alert;
+    }
+
+    void setDialog(boolean isDialog) {
+        this.isDialog = isDialog;
     }
 
     void setTheme(Theme theme) {

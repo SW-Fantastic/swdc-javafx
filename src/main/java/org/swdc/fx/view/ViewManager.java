@@ -75,6 +75,7 @@ public class ViewManager implements DependencyScope {
         theme.applyWithView(view);
         view.setTheme(theme);
         view.setContext(this.context);
+        view.setDialog(description.getProperty(boolean.class,"dialog"));
 
         return (T)view;
     }
