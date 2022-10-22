@@ -44,7 +44,13 @@ public class ViewManager implements DependencyScope {
                 loader.setControllerFactory(context::getByClass);
                 Parent parent = loader.load(inputStream);
                 view.setView(parent);
-                view.setController(loader.getController());
+
+                Object ctrl = loader.getController();
+                view.setController(ctrl);
+                if (ctrl instanceof ViewController) {
+                    ViewController controller = (ViewController) ctrl;
+                    controller.setView(view);
+                }
 
             } catch (Exception e) {
                 throw new RuntimeException(e);

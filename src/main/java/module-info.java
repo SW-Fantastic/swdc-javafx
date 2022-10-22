@@ -4,6 +4,7 @@ module swdc.application.fx {
     requires javafx.fxml;
     requires javafx.controls;
     requires javafx.web;
+    requires javafx.swing;
     requires jakarta.inject;
     requires lesscss.engine;
     requires org.slf4j;
