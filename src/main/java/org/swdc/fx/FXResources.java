@@ -5,6 +5,8 @@ import org.swdc.fx.config.ApplicationConfig;
 
 import java.io.File;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class FXResources {
@@ -22,6 +24,10 @@ public class FXResources {
     private ThreadPoolExecutor executor;
 
     private Class<? extends ApplicationConfig> defaultConfig;
+
+    private ResourceBundle resourceBundle;
+
+    private Locale locale = Locale.getDefault();
 
     public ThreadPoolExecutor getExecutor() {
         return executor;
@@ -77,5 +83,13 @@ public class FXResources {
 
     public void setSplash(Class splash) {
         this.splash = splash;
+    }
+
+    public ResourceBundle getResourceBundle() {
+        return resourceBundle;
+    }
+
+    public void setResourceBundle(ResourceBundle resourceBundle) {
+        this.resourceBundle = resourceBundle;
     }
 }

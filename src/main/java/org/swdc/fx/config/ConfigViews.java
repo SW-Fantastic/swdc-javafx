@@ -17,7 +17,7 @@ import java.util.Optional;
 public class ConfigViews {
 
 
-    public static ObservableList<ConfigPropertiesItem> parseConfigs(AbstractConfig config) {
+    public static ObservableList<ConfigPropertiesItem> parseConfigs(FXResources resources,AbstractConfig config) {
         ObservableList<ConfigPropertiesItem> result = FXCollections.observableArrayList();
         Map<Property, Field> propertiesMap = config.getConfigureInfo();
 
@@ -25,7 +25,7 @@ public class ConfigViews {
             try {
                 Field prop = ent.getValue();
                 PropertyDescriptor desc = new PropertyDescriptor(prop.getName(),config.getClass());
-                ConfigPropertiesItem item = new ConfigPropertiesItem(config,desc,prop);
+                ConfigPropertiesItem item = new ConfigPropertiesItem(config,desc,prop,resources.getResourceBundle());
                 result.add(item);
             } catch (Exception e) {
                 throw new RuntimeException(e);

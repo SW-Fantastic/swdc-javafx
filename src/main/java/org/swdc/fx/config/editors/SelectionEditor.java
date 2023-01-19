@@ -7,11 +7,15 @@ import org.swdc.fx.config.ConfigPropertiesItem;
 import org.swdc.fx.config.PropEditor;
 import org.swdc.fx.config.PropEditorView;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 public class SelectionEditor extends PropEditorView {
 
     private ComboBox comboBox;
+    private Map<String,String> langKeysReverseMap = new HashMap<>();
 
     public SelectionEditor(PropertySheet.Item item) {
         super(item);
@@ -37,9 +41,14 @@ public class SelectionEditor extends PropEditorView {
 
         List<String> arrOptions = comboBox.getItems();
         arrOptions.clear();
+        langKeysReverseMap.clear();
 
+        ResourceBundle bundle = getResources().getResourceBundle();
         for (String option: options) {
-            arrOptions.add(option);
+            if (option.startsWith("%")) {
+                langKeysReverseMap.put(bundle.getString(option.substring(1)),option);
+            }
+            arrOptions.add(option.startsWith("%") ? bundle.getString(option.substring(1)): option);
         }
 
     }
@@ -63,6 +72,9 @@ public class SelectionEditor extends PropEditorView {
             return "";
         }
         String val = (String) comboBox.getSelectionModel().getSelectedItem();
+        if (!langKeysReverseMap.isEmpty()) {
+            return langKeysReverseMap.get(val);
+        }
         return val;
     }
 
@@ -73,12 +85,18 @@ public class SelectionEditor extends PropEditorView {
             refreshValues();
         }
         String val = value.toString();
+        if (val.startsWith("%")) {
+            val = getResources().getResourceBundle().getString(val.substring(1));
+        }
         List<String> valList = comboBox.getItems();
         for (String item: valList) {
             if (item.equalsIgnoreCase(val)) {
                 comboBox.getSelectionModel().select(item);
                 break;
             }
+        }
+        if (val.equals("unavailable")) {
+            comboBox.setDisable(true);
         }
     }
 }

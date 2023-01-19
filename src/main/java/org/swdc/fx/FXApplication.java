@@ -98,6 +98,24 @@ public abstract class FXApplication extends Application implements SWApplication
                 .thenApplyAsync(ctx -> this.context = ctx.load(),asyncPool)
                 .thenApply((ctx) -> {
                     Platform.runLater(() -> {
+                        ApplicationConfig config = ctx.getByClass(resources.getDefaultConfig());
+                        String language = config.getLanguage();
+                        if(!language.equals("unavailable")) {
+                            Locale locale = new Locale(language);
+                            ResourceBundle resourceBundle = ResourceBundle.getBundle("lang/string",locale,this.getClass().getModule());
+                            resources.setResourceBundle(resourceBundle);
+                        } else {
+                            try {
+                                ResourceBundle resourceBundle = ResourceBundle.getBundle("defaultlang/strings",new Locale(Locale.getDefault().getLanguage()));
+                                resources.setResourceBundle(resourceBundle);
+                            } catch (Exception e) {
+                                resources.setResourceBundle(ResourceBundle.getBundle(
+                                        "defaultlang/string",
+                                        Locale.CHINESE,
+                                        FXApplication.class.getModule())
+                                );
+                            }
+                        }
                         logger.info(" application ready.");
                         this.onStarted(ctx);
                         view.hide();

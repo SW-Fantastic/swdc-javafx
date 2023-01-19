@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.FutureTask;
 import java.util.stream.Collectors;
@@ -30,6 +31,10 @@ public class ViewManager implements DependencyScope {
     private DependencyContext context;
 
     private <T> T initialize(Class clazz,T component) {
+
+        FXResources resources = context.getByClass(FXResources.class);
+        ApplicationConfig config = context.getByClass(resources.getDefaultConfig());
+
         AbstractView view = (AbstractView)component;
         AnnotationDescription description = AnnotationUtil.findAnnotation(clazz,View.class);
         String fxml = description.getProperty(String.class,"viewLocation");
@@ -41,6 +46,7 @@ public class ViewManager implements DependencyScope {
                 }
                 // 加载fxml
                 FXMLLoader loader = new FXMLLoader();
+                loader.setResources(resources.getResourceBundle());
                 loader.setControllerFactory(context::getByClass);
                 Parent parent = loader.load(inputStream);
                 view.setView(parent);
@@ -57,15 +63,14 @@ public class ViewManager implements DependencyScope {
             }
         }
 
-        // 应用theme
-        FXResources resources = context.getByClass(FXResources.class);
-        ApplicationConfig config = context.getByClass(resources.getDefaultConfig());
 
-
+        ResourceBundle bundle = resources.getResourceBundle();
         Boolean isStage = description.getProperty(Boolean.class,"stage");
         if (isStage) {
+
             Stage stage = new Stage();
-            stage.setTitle(description.getProperty(String.class,"title"));
+            String title = description.getProperty(String.class,"title");
+            stage.setTitle(title.startsWith("%") ? bundle.getString(title.substring(1)): title);
             stage.setResizable(description.getProperty(Boolean.class,"resizeable"));
             stage.initStyle(description.getProperty(StageStyle.class,"windowStyle"));
             Boolean isDialog = description.getProperty(Boolean.class,"dialog");

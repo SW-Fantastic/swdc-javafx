@@ -2,18 +2,37 @@ package org.swdc.fx.config;
 
 import org.swdc.config.AbstractConfig;
 import org.swdc.config.annotations.Property;
+import org.swdc.fx.config.editors.FileSelectionEditor;
 import org.swdc.fx.config.editors.FolderSelectEditor;
+import org.swdc.fx.config.editors.SelectionEditor;
 
 public abstract class ApplicationConfig extends AbstractConfig {
 
     @Property("theme")
     @PropEditor(
             editor = FolderSelectEditor.class,
-            name = "主题",
-            description = "应用的主题风格。",
+            name = "%app.theme.name",
+            description = "%app.theme.desc",
             resource = "skin"
     )
     private String theme;
+
+    @Property("language")
+    @PropEditor(
+            editor = SelectionEditor.class,
+            name = "%app.language.name",
+            description = "%app.language.desc",
+            resource = "ZH,EN"
+    )
+    private String language;
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 
     public String getTheme() {
         return theme;
