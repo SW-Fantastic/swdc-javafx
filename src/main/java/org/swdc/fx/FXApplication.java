@@ -27,7 +27,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.locks.LockSupport;
 import java.util.stream.Stream;
 
 public abstract class FXApplication extends Application implements SWApplication {
@@ -100,21 +99,26 @@ public abstract class FXApplication extends Application implements SWApplication
                     Platform.runLater(() -> {
                         ApplicationConfig config = ctx.getByClass(resources.getDefaultConfig());
                         String language = config.getLanguage();
+                        ResourceBundle defaultBundle = null;
+                        try {
+                            defaultBundle = ResourceBundle.getBundle("defaultlang/strings",new Locale(Locale.getDefault().getLanguage()));
+                            resources.setResourceBundle(defaultBundle);
+                        } catch (Exception e) {
+                            defaultBundle = ResourceBundle.getBundle(
+                                    "defaultlang/string",
+                                    Locale.CHINESE,
+                                    FXApplication.class.getModule()
+                            );
+                        }
                         if(!language.equals("unavailable")) {
                             Locale locale = new Locale(language);
+                            Locale.setDefault(locale);
                             ResourceBundle resourceBundle = ResourceBundle.getBundle("lang/string",locale,this.getClass().getModule());
-                            resources.setResourceBundle(resourceBundle);
+                            resources.setResourceBundle(new MultipleSourceResourceBundle(
+                                    resourceBundle,defaultBundle
+                            ));
                         } else {
-                            try {
-                                ResourceBundle resourceBundle = ResourceBundle.getBundle("defaultlang/strings",new Locale(Locale.getDefault().getLanguage()));
-                                resources.setResourceBundle(resourceBundle);
-                            } catch (Exception e) {
-                                resources.setResourceBundle(ResourceBundle.getBundle(
-                                        "defaultlang/string",
-                                        Locale.CHINESE,
-                                        FXApplication.class.getModule())
-                                );
-                            }
+                            resources.setResourceBundle(defaultBundle);
                         }
                         logger.info(" application ready.");
                         this.onStarted(ctx);

@@ -22,7 +22,7 @@ public abstract class ApplicationConfig extends AbstractConfig {
             editor = SelectionEditor.class,
             name = "%app.language.name",
             description = "%app.language.desc",
-            resource = "ZH,EN"
+            resource = "%app.languages"
     )
     private String language;
 

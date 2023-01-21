@@ -26,9 +26,14 @@ public class SelectionEditor extends PropEditorView {
     }
 
     private void refreshValues() {
+        ResourceBundle bundle = getResources().getResourceBundle();
+
         PropEditor editorInfo = getItem().getEditorInfo();
         String optionsList = editorInfo.resource();
 
+        if (optionsList.startsWith("%")) {
+            optionsList = bundle.getString(optionsList.substring(1));
+        }
         String[] options;
 
         if (optionsList.contains(",")) {
@@ -43,7 +48,6 @@ public class SelectionEditor extends PropEditorView {
         arrOptions.clear();
         langKeysReverseMap.clear();
 
-        ResourceBundle bundle = getResources().getResourceBundle();
         for (String option: options) {
             if (option.startsWith("%")) {
                 langKeysReverseMap.put(bundle.getString(option.substring(1)),option);
