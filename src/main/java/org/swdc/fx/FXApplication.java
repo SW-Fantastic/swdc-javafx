@@ -112,7 +112,6 @@ public abstract class FXApplication extends Application implements SWApplication
                         }
                         if(!language.equals("unavailable")) {
                             Locale locale = new Locale(language);
-                            Locale.setDefault(locale);
                             ResourceBundle resourceBundle = ResourceBundle.getBundle("lang/string",locale,this.getClass().getModule());
                             resources.setResourceBundle(new MultipleSourceResourceBundle(
                                     resourceBundle,defaultBundle
