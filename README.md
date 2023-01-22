@@ -91,7 +91,7 @@ Project Folder
         |   |——module-info.java （本框架基于JPMS，必须使用module-info）
         |   >> Other classes
         |
-        |——resource
+        |——resources
             |——icons（应用的窗口图标，根据需要添加，不用每一种尺寸都有）
             |   |——icon_16.png
             |   |——icon_24.png
@@ -206,7 +206,15 @@ public class YourAppConfig extends ApplicationConfig {
 并且配合json文件来存储配置，除此之外，还支持yaml，xml，properties三种配置文件格式，请填写对应的handler
 来配合这些格式的文件来使用。
 
-但是无论是哪一种配置文件，继承自`ApplicationConfig`的配置，必须含有`language`和`theme`
+但是无论是哪一种配置文件，继承自`ApplicationConfig`的配置，必须含有`language`和`theme`,下面
+以json为例：
+
+```json
+{
+  "theme": "default",
+  "language": "unavailable"
+}
+```
 
 如果需要操作其他配置文件，可以通过继承`org.swdc.fx.config.AbstractConfig`进行操作，
 `ApplicationConfig`在每一个JavaFX应用程序仅需要一个。
