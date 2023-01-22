@@ -137,7 +137,7 @@ public abstract class AbstractView implements EventEmitter {
         return null;
     }
 
-    private <T> T findById(String id, Node parent) {
+    private <T> T findById(String id, Object parent) {
         if (parent instanceof ToolBar) {
             ToolBar toolBar = (ToolBar) parent;
             List<Node> tools = toolBar.getItems();
@@ -153,16 +153,16 @@ public abstract class AbstractView implements EventEmitter {
                 if (id.equals(item.getId())) {
                     return (T)item;
                 } else {
-                    Node target = findById(id,item);
+                    T target = findById(id,item);
                     if (target != null) {
-                        return (T) target;
+                        return target;
                     }
                 }
             }
             return null;
         } else if (parent instanceof ScrollPane) {
             ScrollPane scrollPane = (ScrollPane)parent;
-            if (scrollPane.getContent().getId().equals(id)) {
+            if (scrollPane.getContent() != null && id.equals(scrollPane.getContent().getId())) {
                 return (T)scrollPane.getContent();
             } else {
                 return findById(id,scrollPane.getContent());
@@ -173,9 +173,9 @@ public abstract class AbstractView implements EventEmitter {
                 if (id.equals(node.getId())) {
                     return (T)node;
                 } else {
-                    Node next = findById(id, node);
+                    T next = findById(id, node);
                     if (next != null) {
-                        return (T)next;
+                        return next;
                     }
                 }
             }
@@ -192,8 +192,36 @@ public abstract class AbstractView implements EventEmitter {
         } else if (parent instanceof TableView) {
             List<TableColumn> columns = ((TableView)parent).getColumns();
             for (TableColumn column: columns) {
-                if (column.getId().equals(id)) {
+                if (id.equals(column.getId())) {
                     return (T)column;
+                }
+            }
+        } else if (parent instanceof MenuBar) {
+            MenuBar menuBar = (MenuBar) parent;
+            for (Menu menu : menuBar.getMenus()) {
+                T rst = findByIdForMenu(id,menu);
+                if (rst != null) {
+                    return rst;
+                }
+            }
+        }
+        return null;
+    }
+
+    private <T> T findByIdForMenu (String id, Menu menu) {
+        if (id.equals(menu.getId())) {
+            return (T)menu;
+        }
+        if (menu.getItems().size() > 0) {
+            for (MenuItem item: menu.getItems()) {
+                if (id.equals(item.getId())) {
+                    return (T)item;
+                }
+                if (item instanceof Menu) {
+                    T rst = findByIdForMenu(id,(Menu) item);
+                    if (rst != null) {
+                        return rst;
+                    }
                 }
             }
         }
