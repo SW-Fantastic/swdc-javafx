@@ -26,6 +26,8 @@ module swdc.application.fx {
     opens fonts;
     opens banner;
 
-    opens org.swdc.fx.config to swdc.application.configs;
+    opens org.swdc.fx.config to
+            swdc.application.configs,
+            com.fasterxml.jackson.databind;
 
 }

@@ -1,5 +1,7 @@
 package org.swdc.fx;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.image.Image;
@@ -15,18 +17,21 @@ import org.swdc.dependency.application.SWApplication;
 import org.swdc.dependency.utils.AnnotationDescription;
 import org.swdc.dependency.utils.AnnotationUtil;
 import org.swdc.fx.config.ApplicationConfig;
+import org.swdc.fx.config.LanguageEntry;
 import org.swdc.fx.font.FontawsomeService;
 import org.swdc.fx.font.MaterialIconsService;
 import org.swdc.fx.util.ApplicationIOUtil;
 
 import java.io.Closeable;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public abstract class FXApplication extends Application implements SWApplication {
@@ -45,40 +50,27 @@ public abstract class FXApplication extends Application implements SWApplication
 
     @Override
     public void stop() throws Exception {
+        stop(v -> System.exit(0));
+    }
+
+    public void stop(Consumer<String[]> complete) throws Exception {
+        String[] args = resources.getArgs().toArray(new String[0]);
         logger.info(" application closing...");
 
-        synchronized (this) {
-            while (asyncPool.getActiveCount() > 0) {
-                logger.info("waiting for threads complete...");
-                Timer timer = new Timer();
-                timer.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        synchronized (FXApplication.this) {
-                            if (asyncPool.getActiveCount() == 0) {
-                                FXApplication.this.notify();
-                            }
-                        }
-                    }
-                },5000);
-                this.wait();
-                timer.cancel();
-            }
+        this.onShutdown(context);
+
+        if (AutoCloseable.class.isAssignableFrom(context.getClass())) {
+            AutoCloseable closeable = (AutoCloseable) context;
+            closeable.close();
         }
 
-        this.onShutdown(context);
-        if (context instanceof Closeable){
-            Closeable ctx = (Closeable) context;
-            ctx.close();
-        } else if (context instanceof AutoCloseable) {
-            AutoCloseable ctx = (AutoCloseable) context;
-            ctx.close();
-        }
+        this.asyncPool.shutdown();
         ApplicationHolder.onStop(this.getClass());
-        asyncPool.shutdown();
         logger.info(" application has been shutdown");
-        System.exit(0);
+
+        complete.accept(args);
     }
+
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -101,7 +93,11 @@ public abstract class FXApplication extends Application implements SWApplication
                         String language = config.getLanguage();
                         ResourceBundle defaultBundle = null;
                         try {
-                            defaultBundle = ResourceBundle.getBundle("defaultlang/strings",new Locale(Locale.getDefault().getLanguage()));
+                            defaultBundle = ResourceBundle.getBundle(
+                                    "defaultlang/string",
+                                    new Locale(config.getLanguage()),
+                                    FXApplication.class.getModule()
+                            );
                             resources.setResourceBundle(defaultBundle);
                         } catch (Exception e) {
                             defaultBundle = ResourceBundle.getBundle(
@@ -214,6 +210,7 @@ public abstract class FXApplication extends Application implements SWApplication
         resources.setConfigures(Arrays.asList(configs));
         resources.setSplash(splash);
         resources.setIcons(images);
+        resources.setSupportedLanguages(loadLanguageResources());
 
         this.asyncPool = new ThreadPoolExecutor(4,12,30, TimeUnit.MINUTES,new LinkedBlockingQueue<>());
 
@@ -221,19 +218,39 @@ public abstract class FXApplication extends Application implements SWApplication
         logger.info(" javafx initializing...");
     }
 
+
+    private Map<String,LanguageEntry> loadLanguageResources() throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        JavaType type = mapper.getTypeFactory().constructParametricType(List.class, LanguageEntry.class);
+        Map<String, LanguageEntry> supportedLang = new HashMap<>();
+
+        InputStream in = getClass().getModule().getResourceAsStream("lang/lang.json");
+        if (in != null) {
+            List<LanguageEntry> entries  = mapper.readValue(in,type);
+            for (LanguageEntry entry: entries) {
+                supportedLang.put(entry.getLocal(),entry);
+            }
+        } else {
+            in = FXApplication.class
+                    .getModule()
+                    .getResourceAsStream("defaultlang/lang.json");
+
+            List<LanguageEntry> entries  = mapper.readValue(in,type);
+            for (LanguageEntry entry: entries) {
+                supportedLang.put(entry.getLocal(),entry);
+            }
+        }
+        return supportedLang;
+    }
+
     @Override
     public void onShutdown(DependencyContext context) {
 
     }
 
-    public void applicationLaunch(String ...args) throws ExecutionException, InterruptedException {
-
+    public void applicationLaunch(String ...args) {
         Thread launcher = new Thread(()->Application.launch(this.getClass(),args));
         launcher.start();
-
-        FXApplication application = ApplicationHolder.getApplication(this.getClass());
-        while (application == null) {
-            application = ApplicationHolder.getApplication(this.getClass());
-        }
     }
+
 }

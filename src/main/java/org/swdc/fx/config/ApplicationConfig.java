@@ -4,6 +4,7 @@ import org.swdc.config.AbstractConfig;
 import org.swdc.config.annotations.Property;
 import org.swdc.fx.config.editors.FileSelectionEditor;
 import org.swdc.fx.config.editors.FolderSelectEditor;
+import org.swdc.fx.config.editors.LanguageSelectionEditor;
 import org.swdc.fx.config.editors.SelectionEditor;
 
 public abstract class ApplicationConfig extends AbstractConfig {
@@ -19,7 +20,7 @@ public abstract class ApplicationConfig extends AbstractConfig {
 
     @Property("language")
     @PropEditor(
-            editor = SelectionEditor.class,
+            editor = LanguageSelectionEditor.class,
             name = "%app.language.name",
             description = "%app.language.desc",
             resource = "%app.languages"

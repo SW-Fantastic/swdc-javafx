@@ -2,10 +2,12 @@ package org.swdc.fx;
 
 import javafx.scene.image.Image;
 import org.swdc.fx.config.ApplicationConfig;
+import org.swdc.fx.config.LanguageEntry;
 
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -24,6 +26,8 @@ public class FXResources {
     private ThreadPoolExecutor executor;
 
     private Class<? extends ApplicationConfig> defaultConfig;
+
+    private Map<String,LanguageEntry> supportedLanguages;
 
     private ResourceBundle resourceBundle;
 
@@ -87,6 +91,14 @@ public class FXResources {
 
     public ResourceBundle getResourceBundle() {
         return resourceBundle;
+    }
+
+    public void setSupportedLanguages(Map<String, LanguageEntry> supportedLanguages) {
+        this.supportedLanguages = supportedLanguages;
+    }
+
+    public Map<String, LanguageEntry> getSupportedLanguages() {
+        return supportedLanguages;
     }
 
     public void setResourceBundle(ResourceBundle resourceBundle) {
