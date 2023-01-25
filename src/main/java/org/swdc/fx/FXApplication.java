@@ -22,10 +22,7 @@ import org.swdc.fx.font.FontawsomeService;
 import org.swdc.fx.font.MaterialIconsService;
 import org.swdc.fx.util.ApplicationIOUtil;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -93,25 +90,33 @@ public abstract class FXApplication extends Application implements SWApplication
                         String language = config.getLanguage();
                         ResourceBundle defaultBundle = null;
                         try {
-                            defaultBundle = ResourceBundle.getBundle(
-                                    "defaultlang/string",
-                                    new Locale(config.getLanguage()),
-                                    FXApplication.class.getModule()
-                            );
-                            resources.setResourceBundle(defaultBundle);
+                            String langName = Locale.getDefault().getLanguage().toLowerCase();
+                            InputStream in = FXResources.class
+                                    .getModule()
+                                    .getResourceAsStream("defaultlang/string_" + langName + ".properties");
+                            if (in == null) {
+                                in = FXResources.class
+                                        .getModule()
+                                        .getResourceAsStream("defaultlang/string_zh.properties");
+                            }
+                            defaultBundle = new PropertyResourceBundle(new InputStreamReader(in,StandardCharsets.UTF_8));
                         } catch (Exception e) {
-                            defaultBundle = ResourceBundle.getBundle(
-                                    "defaultlang/string",
-                                    Locale.CHINESE,
-                                    FXApplication.class.getModule()
-                            );
+                            logger.error("can not read default language, ",e);
+                            System.exit(0);
                         }
                         if(!language.equals("unavailable")) {
-                            Locale locale = new Locale(language);
-                            ResourceBundle resourceBundle = ResourceBundle.getBundle("lang/string",locale,this.getClass().getModule());
-                            resources.setResourceBundle(new MultipleSourceResourceBundle(
-                                    resourceBundle,defaultBundle
-                            ));
+                            try {
+                                Locale locale = new Locale(language);
+                                InputStream inputStream = this.getClass().getModule()
+                                        .getResourceAsStream("lang/string_" + locale.getLanguage().toLowerCase() + ".properties");
+                                if (inputStream != null) {
+                                    ResourceBundle bundle = new PropertyResourceBundle(new InputStreamReader(inputStream,StandardCharsets.UTF_8));
+                                    resources.setResourceBundle(new MultipleSourceResourceBundle(bundle,defaultBundle));
+                                }
+                            } catch (Exception e) {
+                                logger.error("failed to read resource bundle, start failed",e);
+                                System.exit(0);
+                            }
                         } else {
                             resources.setResourceBundle(defaultBundle);
                         }
@@ -190,7 +195,7 @@ public abstract class FXApplication extends Application implements SWApplication
             RuntimeException ex = new RuntimeException("请在SWFXApplication注解的configs里面添加一个继承自" +
                     "ApplicationConfig的配置类，来为应用提供Theme");
             logger.error(" 启动失败",ex);
-            throw ex;
+            System.exit(0);
         }
 
         String[] icons = appDesc.getProperty(String[].class,"icons");
