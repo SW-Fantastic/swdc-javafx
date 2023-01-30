@@ -6,30 +6,19 @@ import javafx.scene.Parent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.swdc.dependency.AbstractDependencyScope;
 import org.swdc.dependency.DependencyContext;
-import org.swdc.dependency.DependencyScope;
 import org.swdc.dependency.utils.AnnotationDescription;
 import org.swdc.dependency.utils.AnnotationUtil;
 import org.swdc.fx.FXResources;
 import org.swdc.fx.config.ApplicationConfig;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.FutureTask;
-import java.util.stream.Collectors;
 
-public class ViewManager implements DependencyScope {
+public class ViewManager extends AbstractDependencyScope {
     
-    private Map<Class,List<AbstractView>> views = new ConcurrentHashMap<>();
-    private Map<String, AbstractView> namedViews = new ConcurrentHashMap<>();
-    private Map<Class, List<AbstractView>> abstractViews = new ConcurrentHashMap<>();
-
-    private DependencyContext context;
-
     private <T> T initialize(Class clazz,T component) {
 
         FXResources resources = context.getByClass(FXResources.class);
@@ -97,22 +86,10 @@ public class ViewManager implements DependencyScope {
     }
 
     @Override
-    public <T> T put(String name, Class clazz, Class multiple, T component) {
-        AbstractView view = (AbstractView) this.put(name,clazz,component);
-        if (multiple != null) {
-            List<AbstractView> list = abstractViews.getOrDefault(multiple,new ArrayList<>());
-            list.add(view);
-            abstractViews.put(multiple,list);
-        }
-        return (T)view;
-    }
-
-    @Override
     public <T> T put(String name, Class clazz, T component) {
         if (!AbstractView.class.isAssignableFrom(clazz)) {
             throw new RuntimeException("不是一个View：" + clazz.getName());
         }
-
         T target = null;
         if (Platform.isFxApplicationThread()){
             target = this.initialize(clazz,component);
@@ -134,15 +111,7 @@ public class ViewManager implements DependencyScope {
         if (multipleViews) {
             return target;
         }
-
-        List<AbstractView> list = views.getOrDefault(clazz,new ArrayList<>());
-        list.add((AbstractView) target);
-        views.put(clazz,list);
-
-        if (!name.equals(clazz.getName())) {
-            namedViews.put(name,(AbstractView) component);
-        }
-        return target;
+        return super.put(name,clazz,target);
     }
 
     @Override
@@ -152,36 +121,12 @@ public class ViewManager implements DependencyScope {
 
     @Override
     public <T> T getByClass(Class<T> clazz) {
-        List<AbstractView> exists =  views.get(clazz);
-        if (exists == null || exists.size() == 0) {
+        if (!AbstractView.class.isAssignableFrom(clazz)) {
             return null;
         }
-        View view = clazz.getAnnotation(View.class);
-        if (exists.size() > 1 && !view.multiple()) {
-            throw new RuntimeException("多个相同的view，请使用getByAbstract");
-        } else if (view.multiple()) {
-            return null;
-        }
-        return (T)exists.get(0);
+        return super.getByClass(clazz);
     }
 
-    @Override
-    public <T> T getByName(String name) {
-        return (T)namedViews.get(name);
-    }
-
-    @Override
-    public <T> List<T> getByAbstract(Class<T> parent) {
-        return (List<T>) abstractViews.get(parent);
-    }
-
-    @Override
-    public List<Object> getAllComponent() {
-        return views.values()
-                .stream()
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
-    }
 
     /**
      * 创建一个不在环境中的view，
