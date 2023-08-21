@@ -7,9 +7,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import org.controlsfx.control.PropertySheet;
-import org.swdc.config.Converter;
 import org.swdc.fx.config.ConfigPropertiesItem;
 import org.swdc.fx.config.PropEditorView;
+import org.swdc.ours.common.type.Converter;
 
 import java.lang.reflect.Field;
 

@@ -14,13 +14,14 @@ import org.swdc.dependency.DependencyContext;
 import org.swdc.dependency.EnvironmentLoader;
 import org.swdc.dependency.LoggerProvider;
 import org.swdc.dependency.application.SWApplication;
-import org.swdc.dependency.utils.AnnotationDescription;
-import org.swdc.dependency.utils.AnnotationUtil;
 import org.swdc.fx.config.ApplicationConfig;
 import org.swdc.fx.config.LanguageEntry;
 import org.swdc.fx.font.FontawsomeService;
 import org.swdc.fx.font.MaterialIconsService;
 import org.swdc.fx.util.ApplicationIOUtil;
+import org.swdc.ours.common.annotations.AnnotationDescription;
+import org.swdc.ours.common.annotations.AnnotationDescriptions;
+import org.swdc.ours.common.annotations.Annotations;
 
 import java.io.*;
 import java.net.URLDecoder;
@@ -164,8 +165,8 @@ public abstract class FXApplication extends Application implements SWApplication
         logger.info(" Application initializing..");
 
         ApplicationHolder.onLaunched(this.getClass(),this);
-        Map<Class, AnnotationDescription> annotations = AnnotationUtil.getAnnotations(this.getClass());
-        AnnotationDescription appDesc = AnnotationUtil.findAnnotationIn(annotations,SWFXApplication.class);
+        AnnotationDescriptions annotations = Annotations.getAnnotations(this.getClass());
+        AnnotationDescription appDesc = Annotations.findAnnotationIn(annotations,SWFXApplication.class);
         logger.info(" using assets: " + appDesc.getProperty(String.class,"assetsFolder"));
         Class[] configs = appDesc.getProperty(Class[].class,"configs");
         Class splash = appDesc.getProperty(Class.class,"splash");

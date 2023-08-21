@@ -3,8 +3,8 @@ package org.swdc.fx.config;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.glyphfont.FontAwesome;
 import org.controlsfx.property.editor.PropertyEditor;
-import org.swdc.config.converters.Converters;
 import org.swdc.fx.FXResources;
+import org.swdc.ours.common.type.Converters;
 
 /**
  * View，这个是显示配置或者属性编辑器的那个view，

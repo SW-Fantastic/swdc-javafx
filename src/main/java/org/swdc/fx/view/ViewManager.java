@@ -8,10 +8,10 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.swdc.dependency.AbstractDependencyScope;
 import org.swdc.dependency.DependencyContext;
-import org.swdc.dependency.utils.AnnotationDescription;
-import org.swdc.dependency.utils.AnnotationUtil;
 import org.swdc.fx.FXResources;
 import org.swdc.fx.config.ApplicationConfig;
+import org.swdc.ours.common.annotations.AnnotationDescription;
+import org.swdc.ours.common.annotations.Annotations;
 
 import java.io.InputStream;
 import java.util.ResourceBundle;
@@ -25,7 +25,7 @@ public class ViewManager extends AbstractDependencyScope {
         ApplicationConfig config = context.getByClass(resources.getDefaultConfig());
 
         AbstractView view = (AbstractView)component;
-        AnnotationDescription description = AnnotationUtil.findAnnotation(clazz,View.class);
+        AnnotationDescription description = Annotations.findAnnotation(clazz,View.class);
         String fxml = description.getProperty(String.class,"viewLocation");
         if (!fxml.isBlank()) {
             try {
@@ -106,7 +106,7 @@ public class ViewManager extends AbstractDependencyScope {
             return null;
         }
 
-        AnnotationDescription desc = AnnotationUtil.findAnnotation(clazz,View.class);
+        AnnotationDescription desc = Annotations.findAnnotation(clazz,View.class);
         boolean multipleViews = desc.getProperty(boolean.class,"multiple");
         if (multipleViews) {
             return target;
@@ -140,7 +140,7 @@ public class ViewManager extends AbstractDependencyScope {
     public static <T extends AbstractView> T createView(Class<T> clazz) {
         try {
             T view = clazz.getConstructor().newInstance();
-            AnnotationDescription description = AnnotationUtil.findAnnotation(clazz,View.class);
+            AnnotationDescription description = Annotations.findAnnotation(clazz,View.class);
             String fxml = description.getProperty(String.class,"viewLocation");
             if (!fxml.isBlank()) {
                 try {

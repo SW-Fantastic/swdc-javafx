@@ -8,8 +8,8 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.swdc.dependency.utils.AnnotationDescription;
-import org.swdc.dependency.utils.AnnotationUtil;
+import org.swdc.ours.common.annotations.AnnotationDescription;
+import org.swdc.ours.common.annotations.Annotations;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -91,7 +91,7 @@ public class Theme {
                 .resolve(this.name)
                 .toFile();
 
-        AnnotationDescription desc = AnnotationUtil.findAnnotation(view.getClass(),View.class);
+        AnnotationDescription desc = Annotations.findAnnotation(view.getClass(),View.class);
         List<String> stylesList = null;
         Node root = null;
 

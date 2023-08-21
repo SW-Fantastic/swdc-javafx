@@ -17,6 +17,8 @@ module swdc.application.fx {
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.annotation;
 
+    requires swdc.commons;
+
     exports org.swdc.fx.config;
     exports org.swdc.fx.config.editors;
     exports org.swdc.fx.view;
