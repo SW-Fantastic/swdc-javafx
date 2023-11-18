@@ -15,7 +15,7 @@
         <java.version>11</java.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <fx.version>15-ea+1</fx.version>
+        <fx.version>21.0.1</fx.version>
     </properties>
 
     <dependencies>

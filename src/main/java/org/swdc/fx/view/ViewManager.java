@@ -3,6 +3,8 @@ package org.swdc.fx.view;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -58,16 +60,22 @@ public class ViewManager extends AbstractDependencyScope {
         if (isStage) {
 
             Stage stage = new Stage();
+            StageStyle style = description.getProperty(StageStyle.class,"windowStyle");
             String title = description.getProperty(String.class,"title");
             stage.setTitle(title.startsWith("%") ? bundle.getString(title.substring(1)): title);
             stage.setResizable(description.getProperty(Boolean.class,"resizeable"));
-            stage.initStyle(description.getProperty(StageStyle.class,"windowStyle"));
+            stage.initStyle(style);
+
             Boolean isDialog = description.getProperty(Boolean.class,"dialog");
             stage.getIcons().addAll(resources.getIcons());
             if (isDialog) {
                 stage.initModality(Modality.APPLICATION_MODAL);
             }
             view.setStage(stage);
+            if (style == StageStyle.TRANSPARENT) {
+                Scene scene = stage.getScene();
+                scene.setFill(Color.TRANSPARENT);
+            }
         }
 
         String themeName = config.getTheme();
