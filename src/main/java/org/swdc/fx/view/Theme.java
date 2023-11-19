@@ -1,11 +1,10 @@
 package org.swdc.fx.view;
 
 import com.asual.lesscss.LessEngine;
-import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.text.Font;
-import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.swdc.ours.common.annotations.AnnotationDescription;
@@ -81,7 +80,7 @@ public class Theme {
      * 给view添加样式
      * @param view
      */
-    public void applyWithView(AbstractView view) {
+    public void applyWithView(TheView view) {
         if (!this.ready) {
             this.prepare();
         }
@@ -93,9 +92,9 @@ public class Theme {
 
         AnnotationDescription desc = Annotations.findAnnotation(view.getClass(),View.class);
         List<String> stylesList = null;
-        Node root = null;
+        Scene root = view.getScene();
 
-        Stage stage = view.getStage();
+        //Stage stage = view.getStage();
         try {
             String defaultStyle = skinAssets
                     .toPath()
@@ -104,19 +103,14 @@ public class Theme {
                     .toURL()
                     .toExternalForm();
 
-            if (stage != null) {
-                root = stage.getScene().getRoot();
-                stylesList = stage.getScene().getStylesheets();
-            } else {
-                Node node = view.getView();
-                if (node instanceof Parent) {
-                    root = node;
-                    stylesList = ((Parent)node).getStylesheets();
-                }
-            }
 
-            if (stylesList == null) {
-                return;
+
+            stylesList = root.getStylesheets();
+            if (view instanceof AbstractView) {
+                AbstractView stdView = (AbstractView) view;
+                stylesList = stdView.getStage()
+                        .getScene()
+                        .getStylesheets();
             }
 
             String background = desc.getProperty(String.class,"background");
@@ -129,6 +123,7 @@ public class Theme {
                         .toExternalForm();
             }
 
+            stylesList.clear();
             stylesList.add(defaultStyle);
 
             String[] additionalStyleSheets = desc.getProperty(String[].class,"css");
@@ -144,7 +139,7 @@ public class Theme {
                         .toExternalForm();
                 stylesList.add(styleUri);
             }
-            root.setStyle("-fx-background-image: url(" + backgroundUri + ");" );
+            root.getRoot().setStyle("-fx-background-image: url(" + backgroundUri + ");" );
         } catch (Exception e){
             throw new RuntimeException("渲染出现异常：",e);
         }
