@@ -9,6 +9,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.swdc.dependency.AbstractDependencyScope;
 import org.swdc.dependency.DependencyContext;
 import org.swdc.fx.FXResources;
@@ -24,6 +26,8 @@ import java.util.concurrent.FutureTask;
 import java.util.stream.Collectors;
 
 public class ViewManager extends AbstractDependencyScope {
+
+    private static final Logger logger = LoggerFactory.getLogger(ViewManager.class);
     
     private <T> T initialize(Class clazz,T component) {
 
@@ -51,9 +55,11 @@ public class ViewManager extends AbstractDependencyScope {
                 if (ctrl instanceof ViewController) {
                     ViewController controller = (ViewController) ctrl;
                     controller.setView(view);
+                    controller.viewReady();
                 }
 
             } catch (Exception e) {
+                logger.error("failed to initialized view", e);
                 throw new RuntimeException(e);
             }
         }

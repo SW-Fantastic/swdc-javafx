@@ -57,6 +57,6 @@ public abstract class AbstractView extends TheView {
 
     @Override
     Scene getScene() {
-        return stage.getScene();
+        return stage == null ? null : stage.getScene();
     }
 }

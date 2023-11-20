@@ -1,6 +1,7 @@
 package org.swdc.fx.view;
 
 import com.asual.lesscss.LessEngine;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -103,14 +104,24 @@ public class Theme {
                     .toURL()
                     .toExternalForm();
 
-
-
-            stylesList = root.getStylesheets();
+            if (root == null) {
+                Node node = view.getView();
+                if (node instanceof Parent) {
+                    Parent parent = (Parent) node;
+                    stylesList = parent.getStylesheets();
+                } else {
+                    return;
+                }
+            } else {
+                stylesList = root.getStylesheets();
+            }
             if (view instanceof AbstractView) {
                 AbstractView stdView = (AbstractView) view;
-                stylesList = stdView.getStage()
-                        .getScene()
-                        .getStylesheets();
+                if (stdView.getStage() != null) {
+                    stylesList = stdView.getStage()
+                            .getScene()
+                            .getStylesheets();
+                }
             }
 
             String background = desc.getProperty(String.class,"background");
@@ -139,7 +150,9 @@ public class Theme {
                         .toExternalForm();
                 stylesList.add(styleUri);
             }
-            root.getRoot().setStyle("-fx-background-image: url(" + backgroundUri + ");" );
+            if (root != null) {
+                root.getRoot().setStyle("-fx-background-image: url(" + backgroundUri + ");" );
+            }
         } catch (Exception e){
             throw new RuntimeException("渲染出现异常：",e);
         }
