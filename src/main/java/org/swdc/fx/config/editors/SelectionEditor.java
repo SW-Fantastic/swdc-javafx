@@ -17,6 +17,8 @@ public class SelectionEditor extends PropEditorView {
     private ComboBox comboBox;
     private Map<String,String> langKeysReverseMap = new HashMap<>();
 
+    private Map<String,String> labeledValue = new HashMap<>();
+
     public SelectionEditor(PropertySheet.Item item) {
         super(item);
     }
@@ -34,25 +36,44 @@ public class SelectionEditor extends PropEditorView {
         if (optionsList.startsWith("%")) {
             optionsList = bundle.getString(optionsList.substring(1));
         }
-        String[] options;
 
+        String[] optionsParts;
         if (optionsList.contains(",")) {
-            options = optionsList.split(",");
+            optionsParts = optionsList.split(",");
         } else if (optionsList.contains(";")) {
-            options = optionsList.split(";");
+            optionsParts = optionsList.split(";");
         } else {
-            options = new String[]{ optionsList };
+            optionsParts = new String[]{ optionsList };
+        }
+
+        for (String opt: optionsParts) {
+            String[] kv = new String[] { opt, opt};
+            if (opt.contains("=>")) {
+                kv[0] = opt.substring(0,opt.indexOf("=>"));
+                kv[1] = opt.substring(opt.indexOf("=>") + 2);
+            } else if (opt.contains("->")) {
+                kv[0] = opt.substring(0,opt.indexOf("->")).trim();
+                kv[1] = opt.substring(opt.indexOf("->") + 2);
+            } else if (opt.contains("=")) {
+                kv = opt.split("=");
+            }
+            labeledValue.put(kv[0].trim(),kv[1].trim());
         }
 
         List<String> arrOptions = comboBox.getItems();
         arrOptions.clear();
         langKeysReverseMap.clear();
 
-        for (String option: options) {
-            if (option.startsWith("%")) {
-                langKeysReverseMap.put(bundle.getString(option.substring(1)),option);
+        for (Map.Entry<String,String> option: labeledValue.entrySet()) {
+            String key = option.getKey();
+            String val = option.getValue();
+            if (key.startsWith("%")) {
+                langKeysReverseMap.put(bundle.getString(key.substring(1)),key);
             }
-            arrOptions.add(option.startsWith("%") ? bundle.getString(option.substring(1)): option);
+            if (val.startsWith("%")) {
+                langKeysReverseMap.put(bundle.getString(val.substring(1)),val);
+            }
+            arrOptions.add(key.startsWith("%") ? bundle.getString(key.substring(1)): key);
         }
 
     }
@@ -61,6 +82,13 @@ public class SelectionEditor extends PropEditorView {
     public Node getEditor() {
         if (comboBox == null) {
             comboBox = new ComboBox();
+            comboBox.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
+                String val = comboBox.getSelectionModel().getSelectedItem().toString();
+                if (langKeysReverseMap.containsKey(val)) {
+                    val = "%" + langKeysReverseMap.get(val);
+                }
+                getItem().setValue(labeledValue.get(val));
+            }));
             refreshValues();
         }
         return comboBox;
@@ -70,31 +98,57 @@ public class SelectionEditor extends PropEditorView {
     public Object getValue() {
         if (comboBox == null) {
             comboBox = new ComboBox();
+            comboBox.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
+                String val = comboBox.getSelectionModel().getSelectedItem().toString();
+                if (langKeysReverseMap.containsKey(val)) {
+                    val = "%" + langKeysReverseMap.get(val);
+                }
+                getItem().setValue(labeledValue.get(val));
+            }));
             refreshValues();
         }
         if (comboBox.getSelectionModel().isEmpty()) {
             return "";
         }
         String val = (String) comboBox.getSelectionModel().getSelectedItem();
-        if (!langKeysReverseMap.isEmpty()) {
-            return langKeysReverseMap.get(val);
+        if (langKeysReverseMap.containsKey(val)) {
+            val = "%" + langKeysReverseMap.get(val);
         }
-        return val;
+        return labeledValue.get(val);
     }
 
     @Override
     public void setValue(Object value) {
         if (comboBox == null) {
             comboBox = new ComboBox();
+            comboBox.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
+                String val = comboBox.getSelectionModel().getSelectedItem().toString();
+                if (langKeysReverseMap.containsKey(val)) {
+                    val = "%" + langKeysReverseMap.get(val);
+                }
+                getItem().setValue(labeledValue.get(val));
+            }));
             refreshValues();
         }
         String val = value.toString();
-        if (val.startsWith("%")) {
-            val = getResources().getResourceBundle().getString(val.substring(1));
+        if (langKeysReverseMap.containsKey(val)) {
+            val = "%" + langKeysReverseMap.get(val);
         }
+
+        String key = null;
+        for (Map.Entry<String,String> entry: labeledValue.entrySet()) {
+            if (entry.getValue().equals(val)) {
+                key = entry.getKey();
+            }
+        }
+
+        if (key.startsWith("%")) {
+            key = getResources().getResourceBundle().getString(key.substring(1));
+        }
+
         List<String> valList = comboBox.getItems();
         for (String item: valList) {
-            if (item.equalsIgnoreCase(val)) {
+            if (item.equalsIgnoreCase(key)) {
                 comboBox.getSelectionModel().select(item);
                 break;
             }

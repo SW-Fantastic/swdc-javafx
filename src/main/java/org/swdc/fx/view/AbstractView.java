@@ -13,11 +13,9 @@ public abstract class AbstractView extends TheView {
 
     private Node view;
 
-    private boolean isDialog = false;
-
     public void show(){
         if (this.stage != null) {
-            if(!isDialog) {
+            if(!isDialog()) {
                 this.stage.show();
             } else {
                 this.stage.showAndWait();
