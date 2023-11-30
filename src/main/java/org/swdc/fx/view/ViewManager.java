@@ -52,12 +52,6 @@ public class ViewManager extends AbstractDependencyScope {
 
                 Object ctrl = loader.getController();
                 view.setController(ctrl);
-                if (ctrl instanceof ViewController) {
-                    ViewController controller = (ViewController) ctrl;
-                    controller.setView(view);
-                    controller.viewReady();
-                }
-
             } catch (Exception e) {
                 logger.error("failed to initialized view", e);
                 throw new RuntimeException(e);
@@ -131,6 +125,12 @@ public class ViewManager extends AbstractDependencyScope {
         view.setTheme(theme);
         view.setContext(this.context);
         view.setDialog(description.getProperty(boolean.class,"dialog"));
+
+        if (view.getController() instanceof ViewController) {
+            ViewController controller = view.getController();
+            controller.setView(view);
+            controller.viewReady();
+        }
 
         return (T)view;
     }
