@@ -59,57 +59,23 @@ public class ViewManager extends AbstractDependencyScope {
         }
 
 
-        ResourceBundle bundle = resources.getResourceBundle();
         Boolean isStage = description.getProperty(Boolean.class,"stage");
         StageStyle style = description.getProperty(StageStyle.class,"windowStyle");
 
         if (isStage) {
 
             if (view instanceof AbstractView) {
-                AbstractView stdView = (AbstractView)view;
-                Stage stage = new Stage();
-                String title = description.getProperty(String.class,"title");
-                stage.setTitle(title.startsWith("%") ? bundle.getString(title.substring(1)): title);
-                stage.setResizable(description.getProperty(Boolean.class,"resizeable"));
-                stage.initStyle(style);
 
-                Boolean isDialog = description.getProperty(Boolean.class,"dialog");
-                stage.getIcons().addAll(resources.getIcons());
-                if (isDialog) {
-                    stage.initModality(Modality.APPLICATION_MODAL);
-                }
-                stdView.setStage(stage);
+                doSetUpStandardStage((AbstractView) view,description,resources);
 
             } else if (view instanceof AbstractSwingView) {
-                JFrame frame = new JFrame();
-                String title = description.getProperty(String.class,"title");
-                frame.setTitle(title.startsWith("%") ? bundle.getString(title.substring(1)): title);
-                frame.setResizable(description.getProperty(Boolean.class,"resizeable"));
-                switch (style) {
-                    case DECORATED:
-                        frame.setType(Window.Type.NORMAL);
-                        frame.setUndecorated(false);
-                        break;
-                    case UNDECORATED:
-                        frame.setType(Window.Type.NORMAL);
-                        frame.setUndecorated(true);
-                        break;
-                    case UTILITY:
-                        frame.setType(Window.Type.UTILITY);
-                        break;
-                    case TRANSPARENT:
-                        frame.setType(Window.Type.UTILITY);
-                        frame.setUndecorated(true);
-                        frame.setBackground(new java.awt.Color(0,0,0,0));
-                }
-                frame.setIconImages(
-                        resources.getIcons()
-                                .stream()
-                                .map(img -> SwingFXUtils.fromFXImage(img,null))
-                                .collect(Collectors.toList())
-                );
-                AbstractSwingView swingView = (AbstractSwingView) view;
-                swingView.setStage(frame);
+
+                doSetUpSwingStage((AbstractSwingView) view,description,resources);
+
+            } else if (view instanceof AbstractSwingDialogView) {
+
+                doSetUpSwingDialogView((AbstractSwingDialogView) view,description,resources);
+
             }
 
             if (style == StageStyle.TRANSPARENT) {
@@ -133,6 +99,103 @@ public class ViewManager extends AbstractDependencyScope {
         }
 
         return (T)view;
+    }
+
+
+    private void doSetUpStandardStage(AbstractView stdView,AnnotationDescription description,FXResources resources) {
+
+        Boolean isDialog = description.getProperty(Boolean.class,"dialog");
+        StageStyle style = description.getProperty(StageStyle.class,"windowStyle");
+        ResourceBundle bundle = resources.getResourceBundle();
+
+        Stage stage = new Stage();
+        String title = description.getProperty(String.class,"title");
+        stage.setTitle(title.startsWith("%") ? bundle.getString(title.substring(1)): title);
+        stage.setResizable(description.getProperty(Boolean.class,"resizeable"));
+        stage.initStyle(style);
+
+        stage.getIcons().addAll(resources.getIcons());
+        if (isDialog) {
+            stage.initModality(Modality.APPLICATION_MODAL);
+        }
+        stdView.setStage(stage);
+
+    }
+
+    private void doSetUpSwingStage(AbstractSwingView swingView,AnnotationDescription description,FXResources resources) {
+
+        StageStyle style = description.getProperty(StageStyle.class,"windowStyle");
+        ResourceBundle bundle = resources.getResourceBundle();
+
+        JFrame frame = new JFrame();
+        String title = description.getProperty(String.class,"title");
+        frame.setTitle(title.startsWith("%") ? bundle.getString(title.substring(1)): title);
+        frame.setResizable(description.getProperty(Boolean.class,"resizeable"));
+
+        switch (style) {
+            case DECORATED:
+                frame.setType(Window.Type.NORMAL);
+                frame.setUndecorated(false);
+                break;
+            case UNDECORATED:
+                frame.setType(Window.Type.NORMAL);
+                frame.setUndecorated(true);
+                break;
+            case UTILITY:
+                frame.setType(Window.Type.UTILITY);
+                break;
+            case TRANSPARENT:
+                frame.setType(Window.Type.UTILITY);
+                frame.setUndecorated(true);
+                frame.setBackground(new java.awt.Color(0,0,0,0));
+        }
+        frame.setIconImages(
+                resources.getIcons()
+                        .stream()
+                        .map(img -> SwingFXUtils.fromFXImage(img,null))
+                        .collect(Collectors.toList())
+        );
+        swingView.setStage(frame);
+    }
+
+    private void doSetUpSwingDialogView(AbstractSwingDialogView swingView,AnnotationDescription description,FXResources resources) {
+
+        Boolean isDialog = description.getProperty(Boolean.class,"dialog");
+        StageStyle style = description.getProperty(StageStyle.class,"windowStyle");
+        ResourceBundle bundle = resources.getResourceBundle();
+
+        JDialog frame = new JDialog();
+        String title = description.getProperty(String.class,"title");
+        frame.setTitle(title.startsWith("%") ? bundle.getString(title.substring(1)): title);
+        frame.setResizable(description.getProperty(Boolean.class,"resizeable"));
+        switch (style) {
+            case DECORATED:
+                frame.setType(Window.Type.NORMAL);
+                frame.setUndecorated(false);
+                break;
+            case UNDECORATED:
+                frame.setType(Window.Type.NORMAL);
+                frame.setUndecorated(true);
+                break;
+            case UTILITY:
+                frame.setType(Window.Type.UTILITY);
+                break;
+            case TRANSPARENT:
+                frame.setType(Window.Type.UTILITY);
+                frame.setUndecorated(true);
+                frame.setBackground(new java.awt.Color(0,0,0,0));
+        }
+        frame.setIconImages(
+                resources.getIcons()
+                        .stream()
+                        .map(img -> SwingFXUtils.fromFXImage(img,null))
+                        .collect(Collectors.toList())
+        );
+        swingView.setStage(frame);
+        if (isDialog) {
+            frame.setModal(true);
+        }
+
     }
 
     @Override

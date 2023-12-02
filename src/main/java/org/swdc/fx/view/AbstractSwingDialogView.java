@@ -11,10 +11,9 @@ import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-public class AbstractSwingView extends TheView {
+public class AbstractSwingDialogView extends TheView {
 
-
-    private JFrame stage;
+    private JDialog stage;
 
     private JFXPanel root;
 
@@ -35,11 +34,11 @@ public class AbstractSwingView extends TheView {
         }
     }
 
-    public JFrame getStage() {
+    public JDialog getStage() {
         return stage;
     }
 
-    void setStage(JFrame stage) {
+    void setStage(JDialog stage) {
         Node view = view();
         if (view == null) {
             view = this.render();
