@@ -59,11 +59,11 @@ public class FolderSelectEditor extends PropEditorView {
                     .collect(Collectors.toList());
             if (this.cbx == null) {
                 this.cbx = new ComboBox<>();
-                this.cbx.selectionModelProperty().addListener(((observable, oldValue, newValue) -> {
+                this.cbx.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
                     if (newValue == null) {
                         return;
                     }
-                    getItem().setValue(newValue);
+                    getItem().setValue(newValue.getFileName().toString());
                 }));
                 this.cbx.setConverter(new StringConverter<>() {
                     @Override

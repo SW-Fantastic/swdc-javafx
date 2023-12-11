@@ -27,6 +27,8 @@ public class Theme {
 
     private File assetsRoot;
 
+    private File themeFolder;
+
     private boolean ready;
 
     public Theme(String name, File assets) {
@@ -38,7 +40,7 @@ public class Theme {
      * 编译主题的less
      */
     private void prepare() {
-        File themeFolder = assetsRoot.toPath()
+        themeFolder = assetsRoot.toPath()
                 .resolve("skin")
                 .resolve(this.name)
                 .toFile();
@@ -86,10 +88,6 @@ public class Theme {
             this.prepare();
         }
 
-        File skinAssets = assetsRoot.toPath()
-                .resolve("skin")
-                .resolve(this.name)
-                .toFile();
 
         AnnotationDescription desc = Annotations.findAnnotation(view.getClass(),View.class);
         List<String> stylesList = null;
@@ -97,7 +95,7 @@ public class Theme {
 
         //Stage stage = view.getStage();
         try {
-            String defaultStyle = skinAssets
+            String defaultStyle = themeFolder
                     .toPath()
                     .resolve("stage.css")
                     .toUri()
@@ -127,7 +125,7 @@ public class Theme {
             String background = desc.getProperty(String.class,"background");
             String backgroundUri = null;
             if (!background.isBlank()) {
-                backgroundUri = skinAssets.toPath().resolve("images")
+                backgroundUri = themeFolder.toPath().resolve("images")
                         .resolve(background)
                         .toUri()
                         .toURL()
@@ -142,7 +140,7 @@ public class Theme {
                 if (styleName.isBlank()) {
                     continue;
                 }
-                String styleUri = skinAssets
+                String styleUri = themeFolder
                         .toPath()
                         .resolve(styleName)
                         .toUri()
@@ -163,13 +161,8 @@ public class Theme {
             this.prepare();
         }
 
-        File skinAssets = assetsRoot.toPath()
-                .resolve("skin")
-                .resolve(this.name)
-                .toFile();
-
         try {
-            String defaultStyle = skinAssets
+            String defaultStyle = themeFolder
                     .toPath()
                     .resolve("stage.css")
                     .toUri()
@@ -191,4 +184,10 @@ public class Theme {
         return theme;
     }
 
+    public File getThemeFolder() {
+        if (!ready) {
+            prepare();
+        }
+        return themeFolder;
+    }
 }

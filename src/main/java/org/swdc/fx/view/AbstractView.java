@@ -11,7 +11,6 @@ public abstract class AbstractView extends TheView {
 
     private Stage stage;
 
-    private Node view;
 
     public void show(){
         if (this.stage != null) {
@@ -30,7 +29,8 @@ public abstract class AbstractView extends TheView {
     }
 
     void setStage(Stage stage) {
-        if (view == null) {
+        Node view = getView();
+        if (getView() == null) {
             view = this.render();
             if (view == null) {
                 throw new RuntimeException("View不存在或加载失败。");
