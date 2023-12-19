@@ -11,6 +11,10 @@ import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+/**
+ * 用来做无边框的，透明的，异形的JavaFX窗口，
+ * 这个JavaFX自己是不支持的，得依靠Swing。
+ */
 public class AbstractSwingView extends TheView {
 
 

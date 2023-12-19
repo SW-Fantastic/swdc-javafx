@@ -7,6 +7,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import org.swdc.fx.StageCloseEvent;
 
+/**
+ * 标准的JavaFX窗口
+ */
 public abstract class AbstractView extends TheView {
 
     private Stage stage;

@@ -9,6 +9,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * 本框架中，所有的JavaFX View都需要标注这个注解，
+ * 这会告诉框架这是个JavaFXView，这样的view是有一个
+ * 专属的scope的，并且会有额外的初始化处理。
+ */
 @Scope
 @ScopeImplement(ViewManager.class)
 @Target(ElementType.TYPE)

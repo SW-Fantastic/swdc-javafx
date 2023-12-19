@@ -11,6 +11,10 @@ import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+/**
+ * 主要用来做透明的或者无边框的JavaFX Modal，
+ * 单独分出这个来是因为Swing的JFrame不能做Modal。
+ */
 public class AbstractSwingDialogView extends TheView {
 
     private JDialog stage;

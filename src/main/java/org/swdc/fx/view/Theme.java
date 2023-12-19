@@ -17,6 +17,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 这个是JavaFX应用的主题，或者说是皮肤
+ * 位于asset文件夹底下的skin目录，每一个目录都是一个主题，
+ * 主题的目录必须含有一个stage.less，此文件的编译结果
+ * 被默认添加到窗口里面。
+ *
+ */
 public class Theme {
 
     private static final Logger logger = LoggerFactory.getLogger(Theme.class);
