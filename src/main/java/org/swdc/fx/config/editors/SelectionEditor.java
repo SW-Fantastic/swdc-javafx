@@ -33,9 +33,6 @@ public class SelectionEditor extends PropEditorView {
         PropEditor editorInfo = getItem().getEditorInfo();
         String optionsList = editorInfo.resource();
 
-        if (optionsList.startsWith("%")) {
-            optionsList = bundle.getString(optionsList.substring(1));
-        }
 
         String[] optionsParts;
         if (optionsList.contains(",")) {
@@ -57,7 +54,11 @@ public class SelectionEditor extends PropEditorView {
             } else if (opt.contains("=")) {
                 kv = opt.split("=");
             }
-            labeledValue.put(kv[0].trim(),kv[1].trim());
+            if (kv[0].startsWith("%")) {
+                labeledValue.put(bundle.getString(kv[0].substring(1).trim()),kv[1].trim());
+            } else {
+                labeledValue.put(kv[0].trim(),kv[1].trim());
+            }
         }
 
         List<String> arrOptions = comboBox.getItems();
@@ -67,13 +68,8 @@ public class SelectionEditor extends PropEditorView {
         for (Map.Entry<String,String> option: labeledValue.entrySet()) {
             String key = option.getKey();
             String val = option.getValue();
-            if (key.startsWith("%")) {
-                langKeysReverseMap.put(bundle.getString(key.substring(1)),key);
-            }
-            if (val.startsWith("%")) {
-                langKeysReverseMap.put(bundle.getString(val.substring(1)),val);
-            }
-            arrOptions.add(key.startsWith("%") ? bundle.getString(key.substring(1)): key);
+            langKeysReverseMap.put(val,key);
+            arrOptions.add(key);
         }
 
     }
@@ -85,7 +81,7 @@ public class SelectionEditor extends PropEditorView {
             comboBox.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
                 String val = comboBox.getSelectionModel().getSelectedItem().toString();
                 if (langKeysReverseMap.containsKey(val)) {
-                    val = "%" + langKeysReverseMap.get(val);
+                    val = langKeysReverseMap.get(val);
                 }
                 getItem().setValue(labeledValue.get(val));
             }));
@@ -101,7 +97,7 @@ public class SelectionEditor extends PropEditorView {
             comboBox.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
                 String val = comboBox.getSelectionModel().getSelectedItem().toString();
                 if (langKeysReverseMap.containsKey(val)) {
-                    val = "%" + langKeysReverseMap.get(val);
+                    val = langKeysReverseMap.get(val);
                 }
                 getItem().setValue(labeledValue.get(val));
             }));
@@ -112,7 +108,7 @@ public class SelectionEditor extends PropEditorView {
         }
         String val = (String) comboBox.getSelectionModel().getSelectedItem();
         if (langKeysReverseMap.containsKey(val)) {
-            val = "%" + langKeysReverseMap.get(val);
+            val = langKeysReverseMap.get(val);
         }
         return labeledValue.get(val);
     }
@@ -123,27 +119,17 @@ public class SelectionEditor extends PropEditorView {
             comboBox = new ComboBox();
             comboBox.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
                 String val = comboBox.getSelectionModel().getSelectedItem().toString();
-                if (langKeysReverseMap.containsKey(val)) {
-                    val = "%" + langKeysReverseMap.get(val);
-                }
                 getItem().setValue(labeledValue.get(val));
             }));
             refreshValues();
         }
         String val = value.toString();
-        if (langKeysReverseMap.containsKey(val)) {
-            val = "%" + langKeysReverseMap.get(val);
-        }
 
         String key = null;
         for (Map.Entry<String,String> entry: labeledValue.entrySet()) {
             if (entry.getValue().equals(val)) {
                 key = entry.getKey();
             }
-        }
-
-        if (key.startsWith("%")) {
-            key = getResources().getResourceBundle().getString(key.substring(1));
         }
 
         List<String> valList = comboBox.getItems();

@@ -94,7 +94,12 @@ public abstract class FXApplication extends Application implements SWApplication
                             String langName = Locale.getDefault().getLanguage().toLowerCase();
                             InputStream in = FXResources.class
                                     .getModule()
-                                    .getResourceAsStream("defaultlang/string_" + langName + ".properties");
+                                    .getResourceAsStream("defaultlang/string_" + config.getLanguage() + ".properties");
+                            if (in == null) {
+                                in = FXResources.class
+                                        .getModule()
+                                        .getResourceAsStream("defaultlang/string_" + langName + ".properties");
+                            }
                             if (in == null) {
                                 in = FXResources.class
                                         .getModule()
