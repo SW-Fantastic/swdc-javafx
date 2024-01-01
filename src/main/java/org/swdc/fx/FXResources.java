@@ -29,7 +29,7 @@ public class FXResources {
 
     private Map<String,LanguageEntry> supportedLanguages;
 
-    private ResourceBundle resourceBundle;
+    private MultipleSourceResourceBundle resourceBundle;
 
     private Locale locale = Locale.getDefault();
 
@@ -89,7 +89,7 @@ public class FXResources {
         this.splash = splash;
     }
 
-    public ResourceBundle getResourceBundle() {
+    public MultipleSourceResourceBundle getResourceBundle() {
         return resourceBundle;
     }
 
@@ -101,7 +101,7 @@ public class FXResources {
         return supportedLanguages;
     }
 
-    public void setResourceBundle(ResourceBundle resourceBundle) {
+    public void setResourceBundle(MultipleSourceResourceBundle resourceBundle) {
         this.resourceBundle = resourceBundle;
     }
 }

@@ -124,7 +124,7 @@ public abstract class FXApplication extends Application implements SWApplication
                                 System.exit(0);
                             }
                         } else {
-                            resources.setResourceBundle(defaultBundle);
+                            resources.setResourceBundle(new MultipleSourceResourceBundle(defaultBundle));
                         }
                         logger.info(" application ready.");
                         this.onStarted(ctx);

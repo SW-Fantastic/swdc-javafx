@@ -5,12 +5,13 @@ import java.util.stream.Collectors;
 
 public class MultipleSourceResourceBundle extends ResourceBundle {
 
-    private ResourceBundle[] bundles;
+    private List<ResourceBundle> bundles;
     private ResourceBundle main;
 
     public MultipleSourceResourceBundle(ResourceBundle mainlyBundle, ResourceBundle ...bundle) {
         this.main = mainlyBundle;
-        this.bundles = bundle;
+        this.bundles = new ArrayList<>();
+        this.bundles.addAll(Arrays.asList(bundle));
     }
 
     @Override
@@ -28,7 +29,7 @@ public class MultipleSourceResourceBundle extends ResourceBundle {
 
     @Override
     public Enumeration<String> getKeys() {
-        Set<String> rst = Arrays.stream(bundles).map(ResourceBundle::getKeys).flatMap(it -> {
+        Set<String> rst = bundles.stream().map(ResourceBundle::getKeys).flatMap(it -> {
             ArrayList<String> keySet = new ArrayList<>();
             while (it.hasMoreElements()) {
                 keySet.add(it.nextElement());
@@ -39,4 +40,9 @@ public class MultipleSourceResourceBundle extends ResourceBundle {
         rst.addAll(main.keySet());
         return Collections.enumeration(rst);
     }
+
+    public void addResource(ResourceBundle bundle) {
+        bundles.add(bundle);
+    }
+
 }
