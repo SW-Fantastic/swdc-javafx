@@ -41,6 +41,19 @@ public class MultipleSourceResourceBundle extends ResourceBundle {
         return Collections.enumeration(rst);
     }
 
+    @Override
+    public boolean containsKey(String key) {
+        if (main.containsKey(key)) {
+            return true;
+        }
+        for (ResourceBundle bundle : bundles) {
+            if (bundle.containsKey(key)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void addResource(ResourceBundle bundle) {
         bundles.add(bundle);
     }
