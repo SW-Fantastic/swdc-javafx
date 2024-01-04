@@ -302,7 +302,7 @@ public class TheView implements EventEmitter {
      * @return 获取到的view
      * @param <T> view的类型。
      */
-    public <T extends AbstractView> T getView(Class<T> view) {
+    public <T extends TheView> T getView(Class<T> view) {
         return context.getByClass(view);
     }
 
