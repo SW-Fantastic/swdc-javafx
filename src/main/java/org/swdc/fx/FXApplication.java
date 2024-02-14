@@ -188,6 +188,8 @@ public abstract class FXApplication extends Application implements SWApplication
                 Path target = new File(location).toPath();
                 target = target.resolve(appDesc.getProperty(String.class,"assetsFolder"));
                 file = target.toFile();
+            } else {
+                file = new File(appDesc.getProperty(String.class,"assetsFolder"));
             }
         } else {
             file = new File(appDesc.getProperty(String.class,"assetsFolder"));
