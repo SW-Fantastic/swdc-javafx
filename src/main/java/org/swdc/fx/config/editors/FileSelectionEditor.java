@@ -18,6 +18,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class FileSelectionEditor extends PropEditorView {
@@ -77,9 +78,14 @@ public class FileSelectionEditor extends PropEditorView {
             }
         });
 
+        ResourceBundle bundle = getResources().getResourceBundle();
+
         HBox.setHgrow(comboBox,Priority.ALWAYS);
         Button button = new Button();
         button.setText("导入");
+        if (bundle != null) {
+            button.setText(bundle.getString("app.import"));
+        }
         button.setOnAction(e -> {
             System.err.println(comboBox.getSelectionModel().getSelectedItem());
             String path = this.getItem().getEditorInfo().resource();
