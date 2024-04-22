@@ -11,7 +11,7 @@ import org.swdc.fx.config.PropEditorView;
  */
 public class TextEditor extends PropEditorView {
 
-    private TextField field;
+    protected TextField field;
 
     public TextEditor(PropertySheet.Item item) {
         super(item);
