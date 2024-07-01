@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
  * 在PropEditor的resources属性指定的文件夹的内部，
  * 可以在这里选择一个文件夹。
  *
+ * 主要是选择内部的文件，如果想要在应用外部选择文件夹，请使用ExternalFolderSelectEditor
+ *
  * 此编辑器用于选择主题，当然也可以选择其他文件夹。
  *
  */
@@ -28,8 +30,6 @@ public class FolderSelectEditor extends PropEditorView {
 
 
     private ComboBox<Path> cbx;
-
-    private List<File> folders = new ArrayList<>();
 
     public FolderSelectEditor(PropertySheet.Item item) {
         super(item);
