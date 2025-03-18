@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.swdc.ours.common.annotations.AnnotationDescription;
@@ -177,6 +178,25 @@ public class Theme {
                     .toExternalForm();
 
             alert.getDialogPane().getStylesheets().add(defaultStyle);
+        }catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void applyWithStage(Stage stage) {
+        if (!this.ready) {
+            this.prepare();
+        }
+
+        try {
+            String defaultStyle = themeFolder
+                    .toPath()
+                    .resolve("stage.css")
+                    .toUri()
+                    .toURL()
+                    .toExternalForm();
+
+            stage.getScene().getStylesheets().add(defaultStyle);
         }catch (Exception e) {
             throw new RuntimeException(e);
         }

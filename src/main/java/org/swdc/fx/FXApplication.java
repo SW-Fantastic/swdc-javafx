@@ -225,7 +225,7 @@ public abstract class FXApplication extends Application implements SWApplication
         resources.setIcons(images);
         resources.setSupportedLanguages(loadLanguageResources());
 
-        this.asyncPool = new ThreadPoolExecutor(4,12,30, TimeUnit.MINUTES,new LinkedBlockingQueue<>());
+        this.asyncPool = new ThreadPoolExecutor(4,12,30, TimeUnit.MINUTES,new ArrayBlockingQueue<>(6,true));
 
         resources.setExecutor(asyncPool);
         logger.info(" javafx initializing...");
