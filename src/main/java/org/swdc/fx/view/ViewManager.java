@@ -137,6 +137,7 @@ public class ViewManager extends AbstractDependencyScope {
         String title = description.getProperty(String.class,"title");
         stage.setTitle(title.startsWith("%") ? bundle.getString(title.substring(1)): title);
         stage.setResizable(description.getProperty(Boolean.class,"resizeable"));
+        stage.setOpacity(description.getProperty(Double.class,"opacity"));
         stage.initStyle(style);
 
         stage.getIcons().addAll(resources.getIcons());

@@ -1,23 +1,23 @@
 module swdc.application.fx {
 
-    requires javafx.graphics;
-    requires javafx.fxml;
-    requires javafx.controls;
-    requires javafx.web;
-    requires javafx.swing;
-    requires jakarta.inject;
-    requires lesscss.engine;
-    requires org.slf4j;
-    requires swdc.application.dependency;
-    requires swdc.application.configs;
-    requires org.controlsfx.controls;
-    requires java.desktop;
+    requires transitive javafx.graphics;
+    requires transitive javafx.fxml;
+    requires transitive javafx.controls;
+    requires transitive javafx.web;
+    requires transitive javafx.swing;
+    requires transitive jakarta.inject;
+    requires transitive lesscss.engine;
+    requires transitive org.slf4j;
+    requires transitive swdc.application.dependency;
+    requires transitive swdc.application.configs;
+    requires transitive org.controlsfx.controls;
+    requires transitive java.desktop;
 
-    requires com.fasterxml.jackson.core;
-    requires com.fasterxml.jackson.databind;
-    requires com.fasterxml.jackson.annotation;
+    requires transitive com.fasterxml.jackson.core;
+    requires transitive com.fasterxml.jackson.databind;
+    requires transitive com.fasterxml.jackson.annotation;
 
-    requires swdc.commons;
+    requires transitive swdc.commons;
 
     exports org.swdc.fx.config;
     exports org.swdc.fx.config.editors;

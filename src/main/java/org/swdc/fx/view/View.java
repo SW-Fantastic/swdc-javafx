@@ -75,4 +75,6 @@ public @interface View {
 
     boolean multiple() default  false;
 
+    double opacity() default 1.0;
+
 }

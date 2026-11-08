@@ -17,6 +17,11 @@ public abstract class AbstractView extends TheView {
 
     public void show(){
         if (this.stage != null) {
+            if (this.stage.isShowing()) {
+                this.stage.toFront();
+                this.stage.requestFocus();
+                return;
+            }
             if(!isDialog()) {
                 this.stage.show();
             } else {
